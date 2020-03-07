@@ -1,0 +1,22 @@
+{
+  "name": "instagram-06-19",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "SET NODE_ENV=production&node src/index",
+    "dev": "nodemon src/index"
+  },
+  "keywords": [],
+  "author": "Erick Silva",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.3",
+    "morgan": "^1.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
