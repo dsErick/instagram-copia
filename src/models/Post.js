@@ -13,11 +13,15 @@ const PostSchema = new mongoose.Schema({
         type: String,
         // required: [true, 'Por favor informe uma descrição']
     },
-    hashtags: String,
+    hashtags: [String],
     image: String,
     likes: {
         type: Number,
         default: 0
+    },
+    user: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
     }
 }, {
     timestamps: true

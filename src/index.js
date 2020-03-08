@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
@@ -15,11 +16,15 @@ const app = express();
 // Body Parser
 app.use(express.json());
 
+// Cookie Parser
+app.use(cookieParser());
+
 // Morgan log
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // Routes
 app.use('/api/v1/posts', require('./routes/posts'));
+app.use('/api/v1/auth', require('./routes/auth'));
 
 // Custom error handler
 app.use(errorHandler);

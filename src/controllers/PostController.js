@@ -40,3 +40,30 @@ exports.addPost = asyncHandler(async (req, res, next) => {
         data: post
     })
 });
+
+// @desc    Update post
+// @route   PUT /api/v1/posts/:id
+// @access  Private
+exports.updatePost = asyncHandler(async (req, res, next) => {
+    const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+
+    if (!post) return next(new ErrorResponse(`Não foi encontrado nenhum post com o id ${req.params.id}`, 404));
+
+    res.status(200).json({
+        success: true,
+        data: post
+    })
+});
+
+
+// @desc    Delete post
+// @route   DELETE /api/v1/posts/:id
+// @access  Private
+exports.deletePost = asyncHandler(async (req, res, next) => {
+    const post = await Post.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+        success: true,
+        data: {}
+    })
+});
