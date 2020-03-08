@@ -19,9 +19,7 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // Routes
-app.get('/', (req, res) => {
-    res.status(200).send('Hello');
-})
+app.use('/api/v1/posts', require('./routes/posts'));
 
 // Custom error handler
 app.use(errorHandler);
