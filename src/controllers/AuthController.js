@@ -1,5 +1,7 @@
+const crypto = require('crypto');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errors');
+const sendMail = require('../utils/sendMail');
 const User = require('../models/User');
 
 // @desc    Register user
@@ -48,6 +50,43 @@ exports.getMe = asyncHandler(async (req, res, next) => {
         success: true,
         data: user
     })
+});
+
+// @desc    Forgot password
+// @route   POST /api/v1/auth/forgotpassword
+// @access  Public
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+    const { email } = req.body;
+
+    // Check for user
+    const user = await User.findOne({ email });
+    if (!user) return next(new ErrorResponse(`User not found.`, 404));
+    
+    // Create reset password fields
+    const token = user.forgotPassword();
+    await user.save({ validateBeforeSave: false });
+
+    // Email options
+    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${token}`;
+    const options = {
+        email: user.email,
+        subject: `Redefinição de senha`,
+        message: `Recebemos uma solicitação para redefinir a senha de sua conta.\nCaso você tenha solicitado uma redefinição faça uma requisição PUT para ${resetUrl}.\nSe você não fez essa solicitação, ignore este email.`
+    };
+
+    try {
+        await sendMail(options);
+        
+        res.status(200).json({
+            success: true,
+            data: 'Email enviado com sucesso'
+        })
+    } catch (err) {
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save({ validateBeforeSave: false });
+        return next(new ErrorResponse(`Erro ao enviar email`, 500));
+    }
 });
 
 // Get JWT, create cookie and send response
