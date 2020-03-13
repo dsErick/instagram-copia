@@ -12,7 +12,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
     }
 
     // Check for token
-    if (!token) return next(new ErrorResponse(`Not authorized to access this route`, 401));
+    if (!token) return next(new ErrorResponse(`Você não é autorizado a acessar esta rota`, 401));
 
     try {
         // Verify token
@@ -23,6 +23,6 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
         next();
     } catch (err) {
-        return next(new ErrorResponse(`Not authorized to access this route`, 401));
+        return next(new ErrorResponse(`Você não é autorizado a acessar esta rota`, 401));
     }
 });

@@ -40,6 +40,19 @@ exports.login = asyncHandler(async (req, res, next) => {
     sendTokenResponse(user, 200, res);
 });
 
+// @desc    Logout User
+// @route   GET /api/v1/auth/logout
+// @access  Private
+exports.logout = asyncHandler(async (req, res, next) => {
+    res.status(200).cookie('token', undefined, {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true
+    }).json({
+        success: true,
+        data: {}
+    })
+});
+
 // @desc    Get logged in user
 // @route   GET /api/v1/auth/me
 // @access  Private
@@ -52,15 +65,48 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     })
 });
 
+// @desc    Update user details
+// @route   PUT /api/v1/auth/updatedetails
+// @access  Private
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+    const { email, name } = req.body;
+
+    const user = await User.findByIdAndUpdate(req.user.id, { email, name }, {
+        new: true,
+        runValidators: true
+    });
+
+    res.status(200).json({
+        success: true,
+        data: user
+    });
+});
+
+// @desc    Update user password
+// @route   PUT /api/v1/auth/updatepassword
+// @access  Private
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+    if (!req.body.currentPassword || !req.body.newPassword) return next(new ErrorResponse(`Informe a senha atual e a nova.`, 400));
+
+    let user = await User.findById(req.user.id).select('+password');
+
+    // Check current password
+    const isMatch = await user.matchPassword(req.body.currentPassword);
+    if (!isMatch) return next(new ErrorResponse(`Senha atual está incorreta`, 400));
+
+    user.password = req.body.newPassword;
+    await user.save();
+
+    sendTokenResponse(user, 200, res);
+});
+
 // @desc    Forgot password
 // @route   POST /api/v1/auth/forgotpassword
 // @access  Public
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
-    const { email } = req.body;
-
     // Check for user
-    const user = await User.findOne({ email });
-    if (!user) return next(new ErrorResponse(`User not found.`, 404));
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário com o email ${req.body.email}.`, 404));
     
     // Create reset password fields
     const token = user.forgotPassword();
@@ -85,8 +131,32 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
         await user.save({ validateBeforeSave: false });
+
         return next(new ErrorResponse(`Erro ao enviar email`, 500));
     }
+});
+
+// @desc    Reset password
+// @route   PUT /api/v1/auth/resetpassword/:resettoken
+// @access  Public
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+    // Hash token for
+    const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
+
+    // Check for user
+    const user = await User.findOne({ resetPasswordToken, resetPasswordExpire: { '$gt': Date.now() } });
+
+    if (!user) return next(new ErrorResponse(`Token inválido`, 400));
+
+    // Update user password
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    // Save user
+    await user.save();
+    
+    sendTokenResponse(user, 200, res);
 });
 
 // Get JWT, create cookie and send response

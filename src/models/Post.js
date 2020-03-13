@@ -5,13 +5,9 @@ const PostSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Por favor informe o autor']
     },
-    place: {
-        type: String,
-        // unique: true
-    },
+    place: String,
     description: {
-        type: String,
-        // required: [true, 'Por favor informe uma descrição']
+        type: String
     },
     hashtags: [String],
     image: String,
@@ -21,7 +17,8 @@ const PostSchema = new mongoose.Schema({
     },
     user: {
         type: mongoose.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     }
 }, {
     timestamps: true
