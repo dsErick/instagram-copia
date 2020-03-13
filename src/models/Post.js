@@ -1,14 +1,9 @@
 const mongoose = require('mongoose');
 
 const PostSchema = new mongoose.Schema({
-    author: {
-        type: String,
-        required: [true, 'Por favor informe o autor']
-    },
+    author: String,
     place: String,
-    description: {
-        type: String
-    },
+    description: String,
     hashtags: [String],
     image: String,
     likes: {

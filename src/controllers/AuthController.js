@@ -3,6 +3,7 @@ const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errors');
 const sendMail = require('../utils/sendMail');
 const User = require('../models/User');
+const Token = require('../models/Token');
 
 // @desc    Register user
 // @route   POST /api/v1/auth/register
@@ -13,8 +14,84 @@ exports.register = asyncHandler(async (req, res, next) => {
     // Create user
     const user = await User.create({ name, email, password });
 
-    // Send token response
+    // Create verification token
+    const token = crypto.randomBytes(20).toString('hex');
+    await Token.create({ user: user.id, token: crypto.createHash('sha256').update(token).digest('hex') });
+    
+    // Send email
+    const url = `${req.protocol}://${req.get('host')}/api/v1/accountverification/${token}`;
+    const options = {
+        email: user.email,
+        subject: 'Confirme sua conta do Instagram',
+        message: `Para terminar de criar sua conta no Instagram, confirme seu endereço de email clicando neste link: ${url}`
+    };
+
+    try {    
+        await sendMail(options);
+
+        res.status(200).json({
+            success: true,
+            data: `Email enviado com sucesso para ${user.email}`
+        })
+    } catch (err) {
+        return next(new ErrorResponse(`Erro ao enviar email`, 500));
+    }
+});
+
+// @desc    Account verification
+// @routes  PUT /api/v1/auth/accountverification/:verificationtoken
+// @access  Public
+exports.accountVerification = asyncHandler(async (req, res, next) => {
+    // Check for token
+    const token = crypto.createHash('sha256').update(req.params.verificationtoken).digest('hex');
+    const verificationToken = await Token.findOne({ token });
+    if (!verificationToken) return next(new ErrorResponse(`Token inválido`, 404));
+    
+    // Check for token user
+    const user = await User.findOne({ _id: verificationToken.user, email: req.body.email });
+    if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário com o token informado.`, 404));
+ 
+    // Verify user email
+    user.isVerified = true;
+    await user.save();
+
+    // Delete verification token
+    await verificationToken.remove();
+
     sendTokenResponse(user, 200, res);
+});
+
+
+// @desc    Resend account verification token
+// @routes  PUT /api/v1/auth/resendtoken
+// @access  Public
+exports.resendToken = asyncHandler(async (req, res, next) => {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) return next(new ErrorResponse(`Email informado inválido`, 404));
+    if (user.isVerified) return next(new ErrorResponse(`Esta conta ja está verificado.`, 401));
+    
+    // Create verification token
+    const token = crypto.randomBytes(20).toString('hex');
+    await Token.findOneAndUpdate({ user: user._id }, { token: crypto.createHash('sha256').update(token).digest('hex') });
+
+    // Send email
+    const url = `${req.protocol}://${req.get('host')}/api/v1/accountverification/${token}`;
+    const options = {
+        email: user.email,
+        subject: 'Confirme sua conta do Instagram',
+        message: `Para terminar de criar sua conta no Instagram, confirme seu endereço de email clicando neste link: ${url}`
+    };
+
+    try {    
+        await sendMail(options);
+
+        res.status(200).json({
+            success: true,
+            data: `Email enviado com sucesso para ${user.email}`
+        })
+    } catch (err) {
+        return next(new ErrorResponse(`Erro ao enviar email`, 500));
+    }
 });
 
 // @desc    Login user
@@ -36,6 +113,9 @@ exports.login = asyncHandler(async (req, res, next) => {
     const isMatch = await user.matchPassword(password);
     if (!isMatch) return next(new ErrorResponse(`Email ou senha inválidos`, 400));
 
+    // Check for verified user
+    if (!user.isVerified) return next(new ErrorResponse(`Para prosseguir é necessário verificar seu email`, 401));
+    
     // Send token response
     sendTokenResponse(user, 200, res);
 });
@@ -125,7 +205,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
         
         res.status(200).json({
             success: true,
-            data: 'Email enviado com sucesso'
+            data: `Email enviado com sucesso para ${user.email}`
         })
     } catch (err) {
         user.resetPasswordToken = undefined;

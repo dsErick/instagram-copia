@@ -18,9 +18,11 @@ exports.protect = asyncHandler(async (req, res, next) => {
         // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
-        // Finda autheticated user
+        // Find autheticated user
         req.user = await User.findById(decoded.id);
 
+        if (!req.user.isVerified) return next(new ErrorResponse(`Para prosseguir é necessário verificar seu email.`, 401));
+        
         next();
     } catch (err) {
         return next(new ErrorResponse(`Você não é autorizado a acessar esta rota`, 401));
