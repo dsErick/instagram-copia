@@ -7,6 +7,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Informe o nome do usuário']
     },
+    // tag: {
+    //     type: String,
+    //     required: [true, 'Informe uma tag'],
+    //     unique: true
+    // },
     email: {
         type: String,
         required: [true, 'Informe um email'],

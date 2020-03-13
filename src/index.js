@@ -13,11 +13,10 @@ connectDB();
 
 const app = express();
 
-// Body Parser
-app.use(express.json());
-
-// Cookie Parser
-app.use(cookieParser());
+app.use(
+    express.json(),         // Body Parser
+    cookieParser()          // Cookie Parser
+);
 
 // Morgan log
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
