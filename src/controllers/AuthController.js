@@ -15,8 +15,7 @@ exports.register = asyncHandler(async (req, res, next) => {
     const user = await User.create({ name, email, password });
 
     // Create verification token
-    const token = crypto.randomBytes(20).toString('hex');
-    await Token.create({ user: user.id, token: crypto.createHash('sha256').update(token).digest('hex') });
+    const token = await Token.createToken(user, 10);
     
     // Send email
     const url = `${req.protocol}://${req.get('host')}/api/v1/accountverification/${token}`;
@@ -34,6 +33,7 @@ exports.register = asyncHandler(async (req, res, next) => {
             data: `Email enviado com sucesso para ${user.email}`
         })
     } catch (err) {
+        await token.remove();
         return next(new ErrorResponse(`Erro ao enviar email`, 500));
     }
 });
@@ -42,21 +42,20 @@ exports.register = asyncHandler(async (req, res, next) => {
 // @routes  PUT /api/v1/auth/accountverification/:verificationtoken
 // @access  Public
 exports.accountVerification = asyncHandler(async (req, res, next) => {
-    // Check for token
-    const token = crypto.createHash('sha256').update(req.params.verificationtoken).digest('hex');
-    const verificationToken = await Token.findOne({ token });
-    if (!verificationToken) return next(new ErrorResponse(`Token inválido`, 404));
+    // Match token
+    const token = await Token.matchToken(req.params.verificationtoken);
+    if (!token) return next(new ErrorResponse(`Token inválido`, 404));
     
-    // Check for token user
-    const user = await User.findOne({ _id: verificationToken.user, email: req.body.email });
-    if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário com o token informado.`, 404));
+    // Check for user
+    const user = await User.findOne({ _id: token.user, email: req.body.email });
+    if (!user) return next(new ErrorResponse(`Endereço de email informado está incorreto.`, 400));
  
     // Verify user email
     user.isVerified = true;
     await user.save();
 
     // Delete verification token
-    await verificationToken.remove();
+    await Token.deleteMany({ user: token.user });
 
     sendTokenResponse(user, 200, res);
 });
@@ -67,12 +66,15 @@ exports.accountVerification = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.resendToken = asyncHandler(async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
-    if (!user) return next(new ErrorResponse(`Email informado inválido`, 404));
-    if (user.isVerified) return next(new ErrorResponse(`Esta conta ja está verificado.`, 401));
+    
+    // Check for registered user
+    if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário com o email ${req.body.email}.`, 404));
+
+    // Make sure user is not verified
+    if (user.isVerified) return next(new ErrorResponse(`Esta conta já está verificada.`, 401));
     
     // Create verification token
-    const token = crypto.randomBytes(20).toString('hex');
-    await Token.findOneAndUpdate({ user: user._id }, { token: crypto.createHash('sha256').update(token).digest('hex') });
+    const token = await Token.createToken(user, 10);
 
     // Send email
     const url = `${req.protocol}://${req.get('host')}/api/v1/accountverification/${token}`;
@@ -90,6 +92,7 @@ exports.resendToken = asyncHandler(async (req, res, next) => {
             data: `Email enviado com sucesso para ${user.email}`
         })
     } catch (err) {
+        await token.remove();
         return next(new ErrorResponse(`Erro ao enviar email`, 500));
     }
 });
@@ -184,19 +187,22 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/auth/forgotpassword
 // @access  Public
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
-    // Check for user
     const user = await User.findOne({ email: req.body.email });
+
+    // Check for user
     if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário com o email ${req.body.email}.`, 404));
+
+    // Make sure user is verified
+    if (!user.isVerified) return next(new ErrorResponse(`Para prosseguir é necessário verificar seu email.`, 401));
     
-    // Create reset password fields
-    const token = user.forgotPassword();
-    await user.save({ validateBeforeSave: false });
+    // Create token
+    const token = await Token.createToken(user, 10);
 
     // Email options
     const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${token}`;
     const options = {
         email: user.email,
-        subject: `Redefinição de senha`,
+        subject: `Redefinição de senha do Instagram`,
         message: `Recebemos uma solicitação para redefinir a senha de sua conta.\nCaso você tenha solicitado uma redefinição faça uma requisição PUT para ${resetUrl}.\nSe você não fez essa solicitação, ignore este email.`
     };
 
@@ -208,9 +214,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
             data: `Email enviado com sucesso para ${user.email}`
         })
     } catch (err) {
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpire = undefined;
-        await user.save({ validateBeforeSave: false });
+        await token.remove();
 
         return next(new ErrorResponse(`Erro ao enviar email`, 500));
     }
@@ -220,21 +224,22 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/auth/resetpassword/:resettoken
 // @access  Public
 exports.resetPassword = asyncHandler(async (req, res, next) => {
-    // Hash token for
-    const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
-
+    // Match token
+    const token = await Token.matchToken(req.params.resettoken);
+    if (!token) return next(new ErrorResponse(`Token inválido`, 404));
+    
     // Check for user
-    const user = await User.findOne({ resetPasswordToken, resetPasswordExpire: { '$gt': Date.now() } });
-
-    if (!user) return next(new ErrorResponse(`Token inválido`, 400));
+    const user = await User.findOne({ _id: token.user, email: req.body.email });
+    if (!user) return next(new ErrorResponse(`Endereço de email informado está incorreto`, 400));
 
     // Update user password
     user.password = req.body.password;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
 
     // Save user
     await user.save();
+
+    // Delete token
+    await Token.deleteMany({ user: token.user });
     
     sendTokenResponse(user, 200, res);
 });

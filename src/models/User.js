@@ -30,8 +30,6 @@ const UserSchema = new mongoose.Schema({
         enum: ['user'],
         default: 'user'
     },
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
     isVerified: {
         type: Boolean,
         default: false
@@ -56,18 +54,6 @@ UserSchema.methods.getSignedJWT = function() {
 // Match password
 UserSchema.methods.matchPassword = async function(password) {
     return await bcrypt.compare(password, this.password);
-}
-
-// Forgot password
-UserSchema.methods.forgotPassword = function() {
-    const token = crypto.randomBytes(20).toString('hex');
-
-    // Set reset password fields
-    this.resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
-    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
-    
-    // return token
-    return token;
 }
 
 module.exports = mongoose.model('User', UserSchema);
