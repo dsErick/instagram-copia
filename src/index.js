@@ -1,6 +1,12 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+const fileupload = require('express-fileupload');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const helmet = require('helmet');
+const hpp = require('hpp');
+const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
@@ -13,9 +19,21 @@ connectDB();
 
 const app = express();
 
+// Middlewares
+const limiter = rateLimit({
+    windowMs: 5 * 60 * 1000,
+    max: 50
+});
 app.use(
     express.json(),         // Body Parser
-    cookieParser()          // Cookie Parser
+    cookieParser(),         // Cookie Parser
+    fileupload(),           // FileUpload
+    mongoSanitize(),        // Prevent user injections
+    xss(),                  // Prevent XSS
+    helmet(),               // Security headers
+    hpp(),                  // Prevent query polution
+    limiter,                // Limit user requests
+    express.static(`${__dirname}/public`)
 );
 
 // Morgan log

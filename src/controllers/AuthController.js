@@ -1,4 +1,3 @@
-const crypto = require('crypto');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errors');
 const sendMail = require('../utils/sendMail');
@@ -9,10 +8,10 @@ const Token = require('../models/Token');
 // @route   POST /api/v1/auth/register
 // @access  Public
 exports.register = asyncHandler(async (req, res, next) => {
-    const { name, email, password } = req.body;
+    const { name, username, bio, email, phoneNumber, gender, password } = req.body;
     
     // Create user
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ name, username, bio, email, phoneNumber, gender, password });
 
     // Create verification token
     const token = await Token.createToken(user, 10);
@@ -152,9 +151,9 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/auth/updatedetails
 // @access  Private
 exports.updateDetails = asyncHandler(async (req, res, next) => {
-    const { email, name } = req.body;
+    const { name, username, bio, phoneNumber, gender } = req.body;
 
-    const user = await User.findByIdAndUpdate(req.user.id, { email, name }, {
+    const user = await User.findByIdAndUpdate(req.user.id, { name, username, bio, phoneNumber, gender }, {
         new: true,
         runValidators: true
     });

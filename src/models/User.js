@@ -1,4 +1,3 @@
-const crypto = require('crypto');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -6,18 +5,32 @@ const bcrypt = require('bcryptjs');
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Informe o nome do usuário']
+        required: [true, 'Informe o nome'],
+        trim: true
     },
-    // tag: {
-    //     type: String,
-    //     required: [true, 'Informe uma tag'],
-    //     unique: true
-    // },
+    username: {
+        type: String,
+        required: [true, 'Informe o nome de usuário'],
+        unique: true,
+        match: [/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/im, 'Informe um nome de usuário válido']
+    },
+    bio: {
+        type: String,
+        trim: true,
+    },
     email: {
         type: String,
         required: [true, 'Informe um email'],
         unique: true,
         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Informe um email válido']
+    },
+    phoneNumber: {
+        type: Number,
+        match: [/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im, 'Informe um número de telefone válido']
+    },
+    gender: {
+        type: String,
+        enum: ['masculino', 'feminino', 'outro']
     },
     password: {
         type: String,
