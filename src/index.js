@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
@@ -33,7 +34,7 @@ app.use(
     helmet(),               // Security headers
     hpp(),                  // Prevent query polution
     limiter,                // Limit user requests
-    express.static(`${__dirname}/public`)
+    express.static(path.join(__dirname, 'public'))
 );
 
 // Morgan log
