@@ -8,6 +8,7 @@ const UserSchema = new mongoose.Schema({
         required: [true, 'Informe o nome'],
         trim: true
     },
+    profilePhoto: String,
     username: {
         type: String,
         required: [true, 'Informe o nome de usuário'],

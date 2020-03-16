@@ -53,7 +53,7 @@ exports.addPost = asyncHandler(async (req, res, next) => {
     const post = await Post.create(req.body);
     
     // Resize and save image
-    await sharp(req.files.image.data).resize(1080, 1350).toFile(`${process.env.POST_IMAGE_PATH}/${imageName}`);
+    await sharp(req.files.image.data).resize(1080, 1080).toFile(`${process.env.POST_IMAGE_PATH}/${imageName}`);
 
     res.status(200).json({
         success: true,
