@@ -6,10 +6,9 @@ const Post = require('../models/Post');
 
 // @desc    Get all post
 // @route   GET /api/v1/posts
-// @route   GET /api/v1/posts/:userId
 // @access  Public
 exports.getPosts = asyncHandler(async (req, res, next) => {
-    const posts = await Post.find(req.params.userId ? { user: req.params.userId } : {});
+    const posts = await Post.find(req.params.userId ? { user: req.params.userId } : {}).populate('comments');
     
     res.status(200).json({
         success: true,

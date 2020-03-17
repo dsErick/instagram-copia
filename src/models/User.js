@@ -49,7 +49,15 @@ const UserSchema = new mongoose.Schema({
         default: false
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true }
+});
+
+// Reverse populate with virtuals
+UserSchema.virtual('posts', {
+    ref: 'Post',
+    localField: '_id',
+    foreignField: 'user'
 });
 
 // Encrypt password before save to database
@@ -63,11 +71,18 @@ UserSchema.pre('save', async function(next) {
 // Get signed jwt
 UserSchema.methods.getSignedJWT = function() {
     return jwt.sign({ id: this.id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
-}
+};
 
 // Match password
 UserSchema.methods.matchPassword = async function(password) {
     return await bcrypt.compare(password, this.password);
-}
+};
+
+// Cascade delete posts when a users is deleted
+UserSchema.pre('remove', async function(next) {
+    await this.model('Post').deleteMany({ user: this._id });
+
+    next();
+});
 
 module.exports = mongoose.model('User', UserSchema);

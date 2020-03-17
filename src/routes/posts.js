@@ -3,14 +3,16 @@ const router = express.Router();
 const { getPosts, getPost, addPost, updatePost, deletePost } = require('../controllers/PostController');
 const { protect } = require('../middleware/auth');
 
+router.use(protect);
 
-router.route('/:userId').get(getPosts);
 router.route('/')
     .get(getPosts)
-    .post(protect, addPost);
+    .post(addPost);
 router.route('/:id')
     .get(getPost)
-    .put(protect, updatePost)
-    .delete(protect, deletePost);
+    .put(updatePost)
+    .delete(deletePost);
+
+router.use('/:postId/comments', require('./comments'));
 
 module.exports = router;

@@ -43,6 +43,7 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 // Routes
 app.use('/api/v1/posts', require('./routes/posts'));
 app.use('/api/v1/auth', require('./routes/auth'));
+app.use('/api/v1/users', require('./routes/users'));
 
 // Custom error handler
 app.use(errorHandler);

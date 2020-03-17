@@ -3,6 +3,7 @@ const User = require('../models/User');
 const asyncHandler = require('./async');
 const ErrorResponse = require('../utils/errors');
 
+// Protect routes
 exports.protect = asyncHandler(async (req, res, next) => {
     let token;
 
@@ -12,7 +13,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
     }
 
     // Check for token
-    if (!token) return next(new ErrorResponse(`Você não é autorizado a acessar esta rota`, 401));
+    if (!token) return next(new ErrorResponse(`Para acessar esta rota é necessário fazer login.`, 401));
 
     try {
         // Verify token
@@ -25,6 +26,15 @@ exports.protect = asyncHandler(async (req, res, next) => {
         
         next();
     } catch (err) {
-        return next(new ErrorResponse(`Você não é autorizado a acessar esta rota`, 401));
+        return next(new ErrorResponse(`Para acessar esta rota é necessário fazer login.`, 401));
     }
 });
+
+// Grant access to specific roles
+exports.authorize = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) return next(new ErrorResponse(`Você não é autorizado a acessar esta rota.`, 401));
+
+        next();
+    }
+}

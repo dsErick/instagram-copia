@@ -13,21 +13,26 @@ exports.register = asyncHandler(async (req, res, next) => {
     const { name, username, bio, email, phoneNumber, gender, password } = req.body;
     let profilePhoto = 'no-photo.png';
 
-    if (req.files && req.files.profilePhoto) {
-        // Make sure the file is a image
-        if (!req.files.profilePhoto.mimetype.startsWith('image')) return next(new ErrorResponse(`Informe uma imagem para a foto do perfil`, 400));
+    // Make sure the file is a image
+    if (req.files && req.files.profilePhoto && !req.files.profilePhoto.mimetype.startsWith('image'))
+        return next(new ErrorResponse(`Informe um arquivo do tipo imagem`, 400));
 
-        // Profile photo name
-        profilePhoto = `IMG_${username}.jpg`;
-    }
-    
     // Create user
-    const user = await User.create({ name, profilePhoto, username, bio, email, phoneNumber, gender, password });
+    let user = await User.create({ name, profilePhoto, username, bio, email, phoneNumber, gender, password });
 
-    if (req.files && req.files.profilePhoto)
+    if (req.files && req.files.profilePhoto) {
+        // Profile photo name
+        profilePhoto = `IMG_${user._id}.jpg`;
+
+        // Save profile photo to user
+        user.profilePhoto = profilePhoto;
+        user = await user.save();
+    
+        // Upload image to system files
         await sharp(req.files.profilePhoto.data)
-            .resize(500, 500)
+            .resize(720, 720)
             .toFile(`${process.env.PROFILE_PHOTO_PATH}/${profilePhoto}`);
+    }
 
     // Create verification token
     const token = await Token.createToken(user, 10);
@@ -167,36 +172,32 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/auth/updatedetails
 // @access  Private
 exports.updateDetails = asyncHandler(async (req, res, next) => {
-    const { name, username, bio, phoneNumber, gender } = req.body;
-    
-    let profilePhoto = req.user.profilePhoto;
-    let deletePhoto;
+    const fieldsToUpdate = {
+        name: req.body.name,
+        username: req.body.username,
+        bio: req.body.bio,
+        phoneNumber: req.body.phoneNumber,
+        gender: req.body.gender,
+        profilePhoto: req.user.profilePhoto
+    };
     
     if (req.files && req.files.profilePhoto) {
         // Make sure the file is a image
         if (!req.files.profilePhoto.mimetype.startsWith('image')) return next(new ErrorResponse(`Informe um arquivo do tipo imagem.`, 400));
 
-        // Check for username changes
-        if (username != req.user.username) deletePhoto = req.user.profilePhoto;
-        
-        // Profile photo name
-        profilePhoto = `IMG_${username}.jpg`;
+        fieldsToUpdate.profilePhoto = `IMG_${req.user.id}.jpg`;
     }
     
-    const user = await User.findByIdAndUpdate(req.user.id, { name, profilePhoto, username, bio, phoneNumber, gender }, {
+    const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
         new: true,
         runValidators: true
     });
     
-    if (req.files && req.files.profilePhoto) {
-        // Delete previous profile photo
-        if (deletePhoto) fs.unlinkSync(`${process.env.PROFILE_PHOTO_PATH}/${deletePhoto}`);
-        
-        // Upload image to system files
+    // Upload image to system files
+    if (req.files && req.files.profilePhoto)
         await sharp(req.files.profilePhoto.data)
-            .resize(500, 500)
-            .toFile(`${process.env.PROFILE_PHOTO_PATH}/${profilePhoto}`);
-    }
+            .resize(720, 720)
+            .toFile(`${process.env.PROFILE_PHOTO_PATH}/${user.profilePhoto}`);
 
     res.status(200).json({
         success: true,
