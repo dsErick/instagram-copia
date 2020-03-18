@@ -26,7 +26,7 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/users/:id
 // @access  Public
 exports.getUser = asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.params.id).populate('posts');
+    const user = await User.findById(req.params.id).populate({ path: 'posts', populate: { path: 'comments', model: 'Comment' }});
 
     if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário com id ${req.params.id}`, 404));
     

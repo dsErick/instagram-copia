@@ -1,4 +1,3 @@
-const fs = require('fs');
 const sharp = require('sharp');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errors');
@@ -30,7 +29,8 @@ exports.register = asyncHandler(async (req, res, next) => {
     
         // Upload image to system files
         await sharp(req.files.profilePhoto.data)
-            .resize(720, 720)
+            .resize(720)
+            .jpeg({ quality: 100, chromaSubsampling: '4:4:4' })
             .toFile(`${process.env.PROFILE_PHOTO_PATH}/${profilePhoto}`);
     }
 
@@ -196,7 +196,8 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
     // Upload image to system files
     if (req.files && req.files.profilePhoto)
         await sharp(req.files.profilePhoto.data)
-            .resize(720, 720)
+            .resize(720)
+            .jpeg({ quality: 100, chromaSubsampling: '4:4:4' })
             .toFile(`${process.env.PROFILE_PHOTO_PATH}/${user.profilePhoto}`);
 
     res.status(200).json({

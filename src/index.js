@@ -8,12 +8,13 @@ const xss = require('xss-clean');
 const helmet = require('helmet');
 const hpp = require('hpp');
 const rateLimit = require('express-rate-limit');
+const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 
 // Load env vars
-dotenv.config({ path: `${__dirname}/config/config.env` });
+dotenv.config({ path: path.join(__dirname, 'config', 'config.env') });
 
 // Connect to database
 connectDB();
@@ -34,7 +35,8 @@ app.use(
     helmet(),               // Security headers
     hpp(),                  // Prevent query polution
     limiter,                // Limit user requests
-    express.static(path.join(__dirname, 'public'))
+    cors(),                 // CORS
+    express.static(path.join(__dirname, 'public'))  // Static folder
 );
 
 // Morgan log

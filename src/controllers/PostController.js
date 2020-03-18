@@ -8,7 +8,7 @@ const Post = require('../models/Post');
 // @route   GET /api/v1/posts
 // @access  Public
 exports.getPosts = asyncHandler(async (req, res, next) => {
-    const posts = await Post.find(req.params.userId ? { user: req.params.userId } : {}).populate('comments');
+    const posts = await Post.find(req.params.userId ? { user: req.params.userId } : {}).populate('comments').sort('-createdAt');
     
     res.status(200).json({
         success: true,
@@ -39,7 +39,7 @@ exports.addPost = asyncHandler(async (req, res, next) => {
     req.body.author = req.user.name;
 
     // Check for image
-    if (!req.files || !req.files.image) return next(new ErrorResponse(`Informe uma imagem para a postagem`, 400));
+    if (!req.files && !req.files.image) return next(new ErrorResponse(`Informe uma imagem para a postagem`, 400));
 
     // Make sure the file is a image
     if (!req.files.image.mimetype.startsWith('image')) return next(new ErrorResponse(`Informe uma imagem para a postagem`, 400));
@@ -52,7 +52,10 @@ exports.addPost = asyncHandler(async (req, res, next) => {
     const post = await Post.create(req.body);
     
     // Resize and save image
-    await sharp(req.files.image.data).resize(1080, 1080).toFile(`${process.env.POST_IMAGE_PATH}/${imageName}`);
+    await sharp(req.files.image.data)
+        .resize(1080)
+        .jpeg({ quality: 100, chromaSubsampling: '4:4:4' })
+        .toFile(`${process.env.POST_IMAGE_PATH}/${imageName}`);
 
     res.status(200).json({
         success: true,
