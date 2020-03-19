@@ -3,17 +3,17 @@
     <div class="login-card">
         <h2 class="mb-4 text-center">Acesse sua conta</h2>
 
-        <div class="alert alert-dismissible alert-danger d-none" :class="{'d-block':errors.length !== 0}">
+        <div class="alert alert-dismissible alert-danger d-none" :class="{'d-block':getErrors.length !== 0}">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <span class="invalid-feedback d-block" role="alert" v-for="error in errors" :key="error">
+            <span class="invalid-feedback d-block" role="alert" v-for="error in getErrors" :key="error">
                 <strong>{{ error }}</strong>
             </span>
         </div>
-        
-        <form @submit.prevent="login">
+
+        <form @submit.prevent="logInUser(user)">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input id="email" type="email" name="email" class="form-control" placeholder="seuemail@gmail.com" v-model="user.email" autofocus>
+                <input id="email" type="email" name="email" class="form-control" placeholder="seuemail@gmail.com" v-model="user.email">
             </div>
             <div class="form-group mb-1">
                 <label for="password">Senha</label>
@@ -25,7 +25,6 @@
             <button class="btn btn-primary w-100 mt-3" type="submit">Entrar</button>
         </form>
 
-
         <p class="text-center mt-4 mb-0">
             Não tem uma conta ainda?
             <router-link to="/register" class="card-link">Registrar</router-link>
@@ -35,7 +34,7 @@
 </template>
 
 <script>
-import { login } from '../../AuthService';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
     name: 'Login',
@@ -44,19 +43,14 @@ export default {
             user: {
                 email: '',
                 password: '',
-            },
-            errors: []
+            }
         }
     },
     methods: {
-        async login() {
-            const res = await login(this.user);
-
-            if (res.data.success) {
-                this.$router.push({ name: 'Home' });
-            }
-            else this.errors = [...res.data.error.split(',')];
-        }
+        ...mapActions(['logInUser'])
+    },
+    computed: {
+        ...mapGetters(['getToken', 'getUser', 'getErrors'])
     }
 }
 </script>
@@ -74,9 +68,9 @@ export default {
     border: 2px solid #bebcbc;
     border-radius: 5px;
 }
-@media (max-width: 766px) {
+/* @media (max-width: 767px) {
     .login {
         background: #111;
     }
-}
+} */
 </style>

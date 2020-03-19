@@ -11,8 +11,12 @@ export const login = async user => {
             password: user.password
         });
         
-        return res;
+        return res.data;
     } catch (err) {
-        return err.response;
+        return err.response.data;
     }
+}
+
+export const getMe = async () => {
+    console.log('Hi');
 }
