@@ -6,10 +6,14 @@ const getters = {
     getErrors: state => state.errors
 };
 
-const actions = {};
+const actions = {
+    setErrors: ({ commit }, errors) => {
+        commit('setErrors', [...errors.split(',')]);
+    }
+};
 
 const mutations = {
-    setError: (state, errors) => state.errors = [...errors.split(',')],
+    setErrors: (state, errors) => state.errors = errors,
     resetErrors: state => state.errors = []
 };
 
@@ -17,5 +21,6 @@ export default {
     state,
     getters,
     actions,
-    mutations
+    mutations,
+    namespaced: true
 }

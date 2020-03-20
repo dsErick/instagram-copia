@@ -5,7 +5,7 @@
 
         <Errors />
         
-        <form @submit.prevent="logInUser(user)">
+        <form @submit.prevent="onSubmit">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input id="email" type="email" name="email" class="form-control" placeholder="seuemail@gmail.com" v-model="user.email">
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions } from 'vuex';
 import Errors from '@/components/partials/Errors';
 
 export default {
@@ -46,10 +46,10 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['logInUser'])
-    },
-    computed: {
-        ...mapGetters(['getToken', 'getUser'])
+        ...mapActions('auth', ['userLogin']),
+        async onSubmit() {
+            if (await this.userLogin(this.user)) this.$router.push({ name: 'Home' });
+        }
     }
 }
 </script>

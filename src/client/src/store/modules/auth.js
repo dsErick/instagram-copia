@@ -11,7 +11,7 @@ const getters = {
 };
 
 const actions = {
-    async logInUser({ commit }, user) {
+    async userLogin({ dispatch, commit }, user) {
         try {
             // Get JWT
             let data = await login(user);
@@ -22,18 +22,27 @@ const actions = {
             // Set token
             commit('setToken', data.token);
 
-            // Get User
-            data = await getMe();
+            return await dispatch('getLoggedInUser');
+        } catch (err) {
+            dispatch('errors/setErrors', err, { root: true });
+        }
+    },
+    async getLoggedInUser({ dispatch, commit }) {
+        try {
+            const data = await getMe();
 
             // Check for any error
             if (!data.success) throw data.error;
-
+    
             // Set user
-            commit('setUser', data.data); 
+            commit('setUser', data.data);
+            
+            // Reset Errors
+            commit('errors/resetErrors', null, { root: true });
 
-            commit('resetErrors', { root: true });
+            return true;
         } catch (err) {
-            commit('setError', err, { root: true });
+            dispatch('errors/setErrors', err, { root: true });
         }
     }
 };
@@ -48,5 +57,6 @@ export default {
     state,
     getters,
     actions,
-    mutations
+    mutations,
+    namespaced: true
 }

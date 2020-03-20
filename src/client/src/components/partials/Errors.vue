@@ -12,7 +12,7 @@ import { mapGetters } from 'vuex'
 
 export default {
     name: 'Errors',
-    computed: mapGetters(['getErrors'])
+    computed: mapGetters('errors', ['getErrors'])
 }
 </script>
 
