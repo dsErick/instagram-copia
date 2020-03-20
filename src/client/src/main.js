@@ -1,13 +1,13 @@
 import Vue from 'vue'
-import axios from 'axios';
-import App from './App.vue'
+import App from './App'
 import router from './router'
 import store from './store'
-
-Vue.config.productionTip = false
+import http from './services';
 
 // set auth header
-axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
+http.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
+
+Vue.config.productionTip = false
 
 new Vue({
   router,

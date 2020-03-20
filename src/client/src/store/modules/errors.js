@@ -9,7 +9,7 @@ const getters = {
 const actions = {};
 
 const mutations = {
-    setError: (state, errors) => state.errors = [...errors],
+    setError: (state, errors) => state.errors = [...errors.split(',')],
     resetErrors: state => state.errors = []
 };
 

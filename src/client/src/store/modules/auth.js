@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { login } from '@/services/AuthService';
+import { login, getMe } from '@/services/AuthService';
 
 const state = {
     token: '',
@@ -13,21 +12,35 @@ const getters = {
 
 const actions = {
     async logInUser({ commit }, user) {
-        const res = await login(user);
-        
-        // Check for erros
-        if (!res.success)
-            commit('setError', res.error, { root: true });
-        else 
-            // Set token
-            commit('setToken', res.token);
+        try {
+            // Get JWT
+            let data = await login(user);
 
-        axios.defaults.headers.common['Authorization'] = `Bearer ${res.token}`;
+            // Check for any error
+            if (!data.success) throw data.error;
+            
+            // Set token
+            commit('setToken', data.token);
+
+            // Get User
+            data = await getMe();
+
+            // Check for any error
+            if (!data.success) throw data.error;
+
+            // Set user
+            commit('setUser', data.data); 
+
+            commit('resetErrors', { root: true });
+        } catch (err) {
+            commit('setError', err, { root: true });
+        }
     }
 };
 
 const mutations = {
     setToken: (state, token) => state.token = token,
+    setUser: (state, user) => state.user = user,
     reset: state => { state.token = ''; state.user = {}; }
 };
 

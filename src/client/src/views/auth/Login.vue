@@ -3,13 +3,8 @@
     <div class="login-card">
         <h2 class="mb-4 text-center">Acesse sua conta</h2>
 
-        <div class="alert alert-dismissible alert-danger d-none" :class="{'d-block':getErrors.length !== 0}">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <span class="invalid-feedback d-block" role="alert" v-for="error in getErrors" :key="error">
-                <strong>{{ error }}</strong>
-            </span>
-        </div>
-
+        <Errors />
+        
         <form @submit.prevent="logInUser(user)">
             <div class="form-group">
                 <label for="email">Email</label>
@@ -17,7 +12,7 @@
             </div>
             <div class="form-group mb-1">
                 <label for="password">Senha</label>
-                <input id="password" type="password" name="password" class="form-control" placeholder="Informe sua senha" required minlength="8" v-model="user.password">
+                <input id="password" type="password" name="password" class="form-control" placeholder="Informe sua senha" required minlength="8" v-model="user.password" autocomplete>
             </div>
             <p class="text-right my-0">
                 <router-link to="/forgotpassword" class="card-link">Esqueceu a senha</router-link>
@@ -27,7 +22,7 @@
 
         <p class="text-center mt-4 mb-0">
             Não tem uma conta ainda?
-            <router-link to="/register" class="card-link">Registrar</router-link>
+            <router-link to="/register" class="card-link">Cadastre-se</router-link>
         </p>
     </div>
 </div>
@@ -35,9 +30,13 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import Errors from '@/components/partials/Errors';
 
 export default {
     name: 'Login',
+    components: {
+        Errors
+    },
     data() {
         return {
             user: {
@@ -50,7 +49,7 @@ export default {
         ...mapActions(['logInUser'])
     },
     computed: {
-        ...mapGetters(['getToken', 'getUser', 'getErrors'])
+        ...mapGetters(['getToken', 'getUser'])
     }
 }
 </script>
@@ -58,7 +57,7 @@ export default {
 <style scoped>
 .login {
     background: linear-gradient(to left bottom, #A12CA7, #C73567, #F2B360);
-    width: 100%;
+    min-width: 100%;
     min-height: 100vh;
 }
 .login-card {
