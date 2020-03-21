@@ -1,7 +1,6 @@
 <template>
-<div class="alert alert-dismissible alert-danger d-none" :class="{'d-block':getErrors.length !== 0}">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <span class="invalid-feedback d-block" role="alert" v-for="error in getErrors" :key="error">
+<div class="alert alert-danger d-none fade show" role="alert" :class="{'d-block':getErrors.length !== 0}">
+    <span class="invalid-feedback d-block" v-for="error in getErrors" :key="error">
         <strong>{{ error }}</strong>
     </span>
 </div>

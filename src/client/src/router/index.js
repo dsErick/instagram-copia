@@ -20,9 +20,12 @@ const router = new VueRouter({
     ]
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
+        if (!store.getters['auth/getToken']) await store.dispatch('auth/getTokenFromCookie', null, { root: true });
+        
         if (store.getters['auth/getToken']) return next();
+
         next({ name: 'Login' });
     } else {
         next();

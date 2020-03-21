@@ -35,7 +35,7 @@ app.use(
     helmet(),               // Security headers
     hpp(),                  // Prevent query polution
     limiter,                // Limit user requests
-    cors(),                 // CORS
+    cors({ credentials: true, origin: ['http://192.168.88.156:8080', 'http://localhost:8080'] }),    // CORS
     express.static(path.join(__dirname, 'public'))  // Static folder
 );
 

@@ -1,4 +1,5 @@
-import { login, getMe } from '@/services/AuthService';
+import router from '@/router';
+import { login, getMe, getJWT } from '@/services/AuthService';
 
 const state = {
     token: '',
@@ -14,7 +15,7 @@ const actions = {
     async userLogin({ dispatch, commit }, user) {
         try {
             // Get JWT
-            let data = await login(user);
+            const data = await login(user);
 
             // Check for any error
             if (!data.success) throw data.error;
@@ -22,7 +23,20 @@ const actions = {
             // Set token
             commit('setToken', data.token);
 
-            return await dispatch('getLoggedInUser');
+            await dispatch('getLoggedInUser');
+
+            router.push({ name: 'Home' });
+        } catch (err) {
+            dispatch('errors/setErrors', err, { root: true });
+        }
+    },
+    async getTokenFromCookie({ dispatch, commit}) {
+        try {
+            const data = await getJWT();
+
+            commit('setToken', data.token);
+
+            dispatch('getLoggedInUser');
         } catch (err) {
             dispatch('errors/setErrors', err, { root: true });
         }
@@ -39,8 +53,6 @@ const actions = {
             
             // Reset Errors
             commit('errors/resetErrors', null, { root: true });
-
-            return true;
         } catch (err) {
             dispatch('errors/setErrors', err, { root: true });
         }

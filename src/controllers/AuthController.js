@@ -168,6 +168,16 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     })
 });
 
+// @desc    Get JWT from cookie
+// @route   GET /api/v1/auth/token
+// @access  Public
+exports.getToken = asyncHandler(async (req, res, next) => {
+    res.status(200).json({
+        success: true,
+        token: req.cookies.token
+    })
+});
+
 // @desc    Update user details
 // @route   PUT /api/v1/auth/updatedetails
 // @access  Private
@@ -292,7 +302,8 @@ const sendTokenResponse = asyncHandler(async (user, statusCode, res) => {
     
     const options = {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
-        httpOnly: true
+        httpOnly: true,
+        SameSite: 'None'
     }
 
     // Set secure cookie if production mode

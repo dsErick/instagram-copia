@@ -5,7 +5,7 @@ import store from './store'
 import http from './services';
 
 // set auth header
-http.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
+http.defaults.headers.common['Authorization'] = `Bearer ${store.state.auth.token}`;
 
 Vue.config.productionTip = false
 

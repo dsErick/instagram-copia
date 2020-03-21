@@ -5,7 +5,7 @@
 
         <Errors />
         
-        <form @submit.prevent="onSubmit">
+        <form @submit="onSubmit">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input id="email" type="email" name="email" class="form-control" placeholder="seuemail@gmail.com" v-model="user.email">
@@ -47,9 +47,14 @@ export default {
     },
     methods: {
         ...mapActions('auth', ['userLogin']),
-        async onSubmit() {
-            if (await this.userLogin(this.user)) this.$router.push({ name: 'Home' });
+        onSubmit(e) {
+            e.preventDefault();
+            this.userLogin(this.user);
         }
+        // async onSubmit(e) {
+        //     e.preventDefault();
+        //     if (await this.userLogin(this.user)) this.$router.push({ name: 'Home' });
+        // }
     }
 }
 </script>
@@ -67,9 +72,4 @@ export default {
     border: 2px solid #bebcbc;
     border-radius: 5px;
 }
-/* @media (max-width: 767px) {
-    .login {
-        background: #111;
-    }
-} */
 </style>
