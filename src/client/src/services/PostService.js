@@ -6,6 +6,6 @@ export const getPosts = async () => {
 
         return data;
     } catch (err) {
-        return err.response.data;
+        return err.response;
     }
 } 

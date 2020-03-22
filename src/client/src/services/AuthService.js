@@ -10,6 +10,9 @@ export const login = async user => {
         // Set Authorization header
         http.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
 
+        // Store JWT to localStorage
+        localStorage.setItem('token', data.token);
+
         return data;
     } catch (err) {
         return err.response.data;
@@ -26,12 +29,17 @@ export const getMe = async () => {
     }
 }
 
-export const getJWT = async () => {
+export const getAccessToken = async () => {
     try {
-        const { data } = await http.get('/auth/token');
-        
+        const { data } = await http.post('/auth/refresh', {
+            token: localStorage.getItem('token')
+        });
+
         // Set Authorization header
         http.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+
+        // Store JWT to localStorage
+        localStorage.setItem('token', data.token);
 
         return data;
     } catch (err) {

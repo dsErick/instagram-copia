@@ -15,15 +15,14 @@ const router = new VueRouter({
             meta: {
                 requiresAuth: true
             },
-            component: () => import('@/views/Home')
+            component: () => import(/* webpackChunkName: Home */'@/views/Home')
         }
     ]
 });
 
 router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        if (!store.getters['auth/getToken']) await store.dispatch('auth/getTokenFromCookie', null, { root: true });
-        
+        if (!store.getters['auth/getToken']) await store.dispatch('auth/refreshAccessToken', null, { root: true });
         if (store.getters['auth/getToken']) return next();
 
         next({ name: 'Login' });

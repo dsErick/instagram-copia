@@ -1,5 +1,5 @@
 import router from '@/router';
-import { login, getMe, getJWT } from '@/services/AuthService';
+import { login, getMe, getAccessToken } from '@/services/AuthService';
 
 const state = {
     token: '',
@@ -30,10 +30,10 @@ const actions = {
             dispatch('errors/setErrors', err, { root: true });
         }
     },
-    async getTokenFromCookie({ dispatch, commit}) {
+    async refreshAccessToken({ dispatch, commit }) {
         try {
-            const data = await getJWT();
-
+            const data = await getAccessToken();
+            
             commit('setToken', data.token);
 
             if (data.token) dispatch('getLoggedInUser');
