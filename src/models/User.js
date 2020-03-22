@@ -8,7 +8,10 @@ const UserSchema = new mongoose.Schema({
         required: [true, 'Informe o nome'],
         trim: true
     },
-    profilePhoto: String,
+    profilePhoto: {
+        type: String,
+        default: 'no-photo.png'
+    },
     username: {
         type: String,
         required: [true, 'Informe o nome de usuário'],

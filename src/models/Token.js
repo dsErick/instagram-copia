@@ -11,25 +11,55 @@ const TokenSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    expires: Date
+    jwt: {
+        type: String,
+        required: function() { return this.tokenType === 'refresh' }
+    },
+    tokenType: {
+        type: String,
+        enum: ['refresh', 'verification', 'resetPassword'],
+        default: 'refresh'
+    },
+    expiresAt: Date
+},{
+    timestamps: true
 });
 
 // Create token
-TokenSchema.statics.createToken = async function(user, expires) {
+TokenSchema.statics.createToken = async function(user, expires, tokenType, jwt) {
     const token = crypto.randomBytes(20).toString('hex');
-    await this.create({
+
+    const obj = {
         user,
         token: crypto.createHash('sha256').update(token).digest('hex'),
-        expires: Date.now() + expires * 60 * 1000
-    });
+        tokenType,
+        expiresAt: Date.now() + expires * 60 * 1000
+    }
+
+    if (tokenType === 'refresh') obj.jwt = jwt;
+    
+    await this.create(obj);
     return token;
 }
 
-TokenSchema.statics.matchToken = async function(token) {
-    return await this.findOne({
+// Match token in database
+TokenSchema.statics.matchToken = async function(token, tokenType, jwt, user) {
+    const conditions = {
         token: crypto.createHash('sha256').update(token).digest('hex'),
-        expires: { $gt: Date.now() }
-    });
+        tokenType,
+        expiresAt: { $gt: Date.now() }
+    };
+
+    if (jwt) conditions.jwt = jwt;
+    if (user) conditions.user = user;
+    
+    return await this.findOne(conditions);
 }
+
+// Delete refresh token from user when login
+TokenSchema.pre('save', async function(next) {
+    if (this.isModified('token')) await this.model('Token').deleteMany({ user: this.user, tokenType: 'refresh' });
+    next();
+});
 
 module.exports = mongoose.model('Token', TokenSchema);

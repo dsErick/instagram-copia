@@ -29,7 +29,7 @@ export const getMe = async () => {
 export const getJWT = async () => {
     try {
         const { data } = await http.get('/auth/token');
-
+        
         // Set Authorization header
         http.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
 

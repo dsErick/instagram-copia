@@ -36,7 +36,7 @@ const actions = {
 
             commit('setToken', data.token);
 
-            dispatch('getLoggedInUser');
+            if (data.token) dispatch('getLoggedInUser');
         } catch (err) {
             dispatch('errors/setErrors', err, { root: true });
         }

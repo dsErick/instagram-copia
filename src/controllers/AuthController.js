@@ -9,36 +9,16 @@ const Token = require('../models/Token');
 // @route   POST /api/v1/auth/register
 // @access  Public
 exports.register = asyncHandler(async (req, res, next) => {
-    const { name, username, bio, email, phoneNumber, gender, password } = req.body;
-    let profilePhoto = 'no-photo.png';
-
-    // Make sure the file is a image
-    if (req.files && req.files.profilePhoto && !req.files.profilePhoto.mimetype.startsWith('image'))
-        return next(new ErrorResponse(`Informe um arquivo do tipo imagem`, 400));
+    const { name, username, email, password } = req.body;
 
     // Create user
-    let user = await User.create({ name, profilePhoto, username, bio, email, phoneNumber, gender, password });
-
-    if (req.files && req.files.profilePhoto) {
-        // Profile photo name
-        profilePhoto = `IMG_${user._id}.jpg`;
-
-        // Save profile photo to user
-        user.profilePhoto = profilePhoto;
-        user = await user.save();
-    
-        // Upload image to system files
-        await sharp(req.files.profilePhoto.data)
-            .resize(720)
-            .jpeg({ quality: 100, chromaSubsampling: '4:4:4' })
-            .toFile(`${process.env.PROFILE_PHOTO_PATH}/${profilePhoto}`);
-    }
+    let user = await User.create({ name, username, email, password });
 
     // Create verification token
-    const token = await Token.createToken(user, 10);
+    const token = await Token.createToken(user, 10, 'verification');
     
     // Send email
-    const url = `${req.protocol}://${req.get('host')}/api/v1/accountverification/${token}`;
+    const url = `${req.protocol}://${req.get('host')}/api/v1/auth/accountverification/${token}`;
     const options = {
         email: user.email,
         subject: 'Confirme sua conta do Instagram',
@@ -63,9 +43,9 @@ exports.register = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.accountVerification = asyncHandler(async (req, res, next) => {
     // Match token
-    const token = await Token.matchToken(req.params.verificationtoken);
-    if (!token) return next(new ErrorResponse(`Token inválido`, 404));
-    
+    const token = await Token.matchToken(req.params.verificationtoken, 'verification');
+    if (!token) return next(new ErrorResponse(`Token inválido`, 401));
+
     // Check for user
     const user = await User.findOne({ _id: token.user, email: req.body.email });
     if (!user) return next(new ErrorResponse(`Endereço de email informado está incorreto.`, 400));
@@ -94,10 +74,10 @@ exports.resendToken = asyncHandler(async (req, res, next) => {
     if (user.isVerified) return next(new ErrorResponse(`Esta conta já está verificada.`, 401));
     
     // Create verification token
-    const token = await Token.createToken(user, 10);
+    const token = await Token.createToken(user, 10, 'verification');
 
     // Send email
-    const url = `${req.protocol}://${req.get('host')}/api/v1/accountverification/${token}`;
+    const url = `${req.protocol}://${req.get('host')}/api/v1/auth/accountverification/${token}`;
     const options = {
         email: user.email,
         subject: 'Confirme sua conta do Instagram',
@@ -147,6 +127,10 @@ exports.login = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/auth/logout
 // @access  Private
 exports.logout = asyncHandler(async (req, res, next) => {
+    const refreshToken = await Token.matchToken(req.cookies.token, 'refresh', null, req.user.id);
+
+    await refreshToken.remove();
+
     res.status(200).cookie('token', undefined, {
         expires: new Date(Date.now() + 10 * 1000),
         httpOnly: true
@@ -168,14 +152,31 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     })
 });
 
-// @desc    Get JWT from cookie
-// @route   GET /api/v1/auth/token
+// @desc    Get refresh token from cookie and generate a new access JWT
+// @route   POST /api/v1/auth/refresh
 // @access  Public
-exports.getToken = asyncHandler(async (req, res, next) => {
+exports.getAccessToken = asyncHandler(async (req, res, next) => {
+    // Check for refresh token and access token
+    if (!req.cookies.token || !req.body.token) return next(new ErrorResponse(`Para acessar esta rota é necessário fazer login.`, 401));
+
+    // Check for refresh token in cookies
+    let refreshToken = await Token.matchToken(req.cookies.token, 'refresh', req.body.token);
+    if (!refreshToken) return next(new ErrorResponse(`Token inválido.`, 401));
+    
+    // Get logged user to create access JWT
+    const user = await User.findById(refreshToken.user);
+    
+    // Create access JWT
+    const token = user.getSignedJWT();
+
+    // Update access jwt from refresh token
+    refreshToken.jwt = token;
+    await refreshToken.save();
+    
     res.status(200).json({
         success: true,
-        token: req.cookies.token
-    })
+        token
+    }) 
 });
 
 // @desc    Update user details
@@ -247,7 +248,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     if (!user.isVerified) return next(new ErrorResponse(`Para prosseguir é necessário verificar seu email.`, 401));
     
     // Create token
-    const token = await Token.createToken(user, 10);
+    const token = await Token.createToken(user, 10, 'resetPassword');
 
     // Email options
     const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${token}`;
@@ -276,8 +277,8 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.resetPassword = asyncHandler(async (req, res, next) => {
     // Match token
-    const token = await Token.matchToken(req.params.resettoken);
-    if (!token) return next(new ErrorResponse(`Token inválido`, 404));
+    const token = await Token.matchToken(req.params.resettoken, 'resetPassword');
+    if (!token) return next(new ErrorResponse(`Token inválido`, 401));
     
     // Check for user
     const user = await User.findOne({ _id: token.user, email: req.body.email });
@@ -297,9 +298,12 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
 // Get JWT, create cookie and send response
 const sendTokenResponse = asyncHandler(async (user, statusCode, res) => {
-    // Get Signed JWT
+    // Get Signed JWT for access
     const token = user.getSignedJWT();
-    
+
+    // Create refresh token
+    const refreshToken = await Token.createToken(user, process.env.REFRESH_TOKEN_EXPIRE, 'refresh', token);
+
     const options = {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
         httpOnly: true,
@@ -309,7 +313,7 @@ const sendTokenResponse = asyncHandler(async (user, statusCode, res) => {
     // Set secure cookie if production mode
     if (process.env.NODE_ENV === 'production') options.secure = true;
     
-    res.status(statusCode).cookie('token', token, options).json({
+    res.status(statusCode).cookie('token', refreshToken, options).json({
         success: true,
         token
     })
