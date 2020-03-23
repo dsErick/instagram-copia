@@ -1,50 +1,76 @@
 import http from './';
 
-export const login = async user => {
-    try {
-        const { data } = await http.post('/auth/login', {
-            email: user.email,
-            password: user.password
-        });
+const servicesHandler = fn => params => Promise.resolve(fn(params)).catch(err => { return err.response.data });
 
-        // Set Authorization header
-        http.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+// @desc    Send verification email for new user
+// @access  Public
+export const register = servicesHandler(async user => {
+    const { data } = await http.post('/auth/register', {
+       name: user.name, 
+       username: user.username, 
+       email: user.email, 
+       password: user.password, 
+    });
 
-        return data;
-    } catch (err) {
-        return err.response.data;
-    }
-}
+    return data;
+});
+  
+// @desc    Verifify new user account
+// @access  Public
+export const accountVerification = servicesHandler(async (params) => {
+    const { data } = await http.put(`/auth/accountverification/${params.token}`, {
+        email: params.email
+    });
+    
+    // Set Authorization header
+    http.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
 
-export const getMe = async () => {
-    try {
-        const { data } = await http.get('/auth/me');
+    return data;
+});
 
-        return data;
-    } catch (err) {
-        return err.response.data
-    }
-}
+// @desc    
+// @access  Public
+export const resendToken = servicesHandler(async (email) => {
+    const { data } = await http.put(`/auth/resendtoken`, { email });
+    
+    return data;
+});
+  
+// @desc    Login user
+// @access  Public
+export const login = servicesHandler(async user => {
+    const { data } = await http.post('/auth/login', {
+        email: user.email,
+        password: user.password
+    });
 
-export const getAccessToken = async () => {
-    try {
-        const { data } = await http.post('/auth/refresh');
+    // Set Authorization header
+    http.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
 
-        // Set Authorization header
-        http.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+    return data;
+});
 
-        return data;
-    } catch (err) {
-        return err.response.data
-    }
-}
+export const getMe = servicesHandler(async () => {
+    const { data } = await http.get('/auth/me');
 
-export const logoutUser = async () => {
-    try {
-        const { data } = await http.get('/auth/logout');
-        
-        return data;
-    } catch (err) {
-        return err.response.data;
-    }
-}
+    return data;
+});
+
+// @desc    Refresh access token
+// @access  Private
+export const getAccessToken = servicesHandler(async () => {
+    const { data } = await http.post('/auth/refresh');
+
+    // Set Authorization header
+    http.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+
+    return data;
+});
+
+// @desc    Logout user
+// @access  private
+export const logout = servicesHandler(async () => {
+    const { data } = await http.get('/auth/logout');
+
+    return data;
+});

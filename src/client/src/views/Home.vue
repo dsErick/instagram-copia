@@ -1,7 +1,13 @@
 <template>
 <div class="home">
-    <h1>Home</h1>
-    
+    <div class="row">
+        <div class="col-sm-8">
+            <h1>Home</h1>
+        </div>
+        <div class="col-sm-4 text-right">
+            <button @click="logoutUser" class="btn btn-link">Sair</button>
+        </div>
+    </div>
     <Errors />
     {{ getPosts }}
 </div>
@@ -17,7 +23,8 @@ export default {
         Errors
     },
     methods: {
-        ...mapActions(['ActionGetPosts'])
+        ...mapActions(['ActionGetPosts']),
+        ...mapActions('auth', ['logoutUser'])
     },
     async created() {
         this.ActionGetPosts();

@@ -32,7 +32,7 @@
                 <span class="invalid-feedback" role="alert"></span>
             </div>
 
-            <button value="1" class="btn btn-primary w-100 mt-3" type="submit">Entrar</button>
+            <button value="1" class="btn btn-primary w-100 mt-3" type="submit">Cadastrar</button>
         </form>
 
         <p class="text-center mt-4 mb-0">
@@ -45,6 +45,7 @@
 
 <script>
 import Errors from '@/components/partials/Errors';
+import { mapActions } from 'vuex';
 
 export default {
     name: 'Register',
@@ -63,7 +64,8 @@ export default {
         }
     },
     methods: {
-        onSubmit(e) {
+        ...mapActions('auth', ['registerUser']),
+        async onSubmit(e) {
             let isValid = true;
             e.target.elements.forEach(input => {
                 if (input.value === '') {
@@ -91,9 +93,7 @@ export default {
                 }
             });
 
-            if (isValid) {
-                alert('Valid');
-            }
+            if (isValid) this.registerUser(this.user);
         },
         formValidation(input, msg) {
             input.classList.add('is-invalid');

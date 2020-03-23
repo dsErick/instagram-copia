@@ -15,14 +15,14 @@ exports.register = asyncHandler(async (req, res, next) => {
     let user = await User.create({ name, username, email, password });
 
     // Create verification token
-    const token = await Token.createToken(user, 10, 'verification');
+    const token = await Token.createToken(user, 30, 'verification');
     
     // Send email
-    const url = `${req.protocol}://${req.get('host')}/api/v1/auth/accountverification/${token}`;
+    const url = `${req.protocol}://192.168.88.156:8080/accountverification/${token}`;
     const options = {
         email: user.email,
         subject: 'Confirme sua conta do Instagram',
-        message: `Para terminar de criar sua conta no Instagram, confirme seu endereço de email clicando neste link: ${url}`
+        message: `Para terminar de criar sua conta no Instagram, confirme seu endereço de email clicando no link abaixo \r\n: ${url}`
     };
 
     try {    
@@ -30,9 +30,10 @@ exports.register = asyncHandler(async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            data: `Email enviado com sucesso para ${user.email}`
+            data: user.email
         })
     } catch (err) {
+        await user.remove();
         await token.remove();
         return next(new ErrorResponse(`Erro ao enviar email`, 500));
     }
@@ -44,7 +45,7 @@ exports.register = asyncHandler(async (req, res, next) => {
 exports.accountVerification = asyncHandler(async (req, res, next) => {
     // Match token
     const token = await Token.matchToken(req.params.verificationtoken, 'verification');
-    if (!token) return next(new ErrorResponse(`Token inválido`, 401));
+    if (!token) return next(new ErrorResponse(`Token inválido`, 404));
 
     // Check for user
     const user = await User.findOne({ _id: token.user, email: req.body.email });
@@ -74,22 +75,23 @@ exports.resendToken = asyncHandler(async (req, res, next) => {
     if (user.isVerified) return next(new ErrorResponse(`Esta conta já está verificada.`, 401));
     
     // Create verification token
-    const token = await Token.createToken(user, 10, 'verification');
+    const token = await Token.createToken(user, 30, 'verification');
 
     // Send email
-    const url = `${req.protocol}://${req.get('host')}/api/v1/auth/accountverification/${token}`;
+    const url = `${req.protocol}://192.168.88.156:8080/accountverification/${token}`;
     const options = {
         email: user.email,
         subject: 'Confirme sua conta do Instagram',
-        message: `Para terminar de criar sua conta no Instagram, confirme seu endereço de email clicando neste link: ${url}`
+        message: `Para terminar de criar sua conta no Instagram, confirme seu endereço de email clicando no link abaixo \r\n: ${url}`
     };
+
 
     try {    
         await sendMail(options);
 
         res.status(200).json({
             success: true,
-            data: `Email enviado com sucesso para ${user.email}`
+            data: user.email
         })
     } catch (err) {
         await token.remove();
@@ -166,7 +168,7 @@ exports.getAccessToken = asyncHandler(async (req, res, next) => {
 
     // Check for refresh token
     let refreshToken = await Token.matchToken(req.cookies.refreshToken, 'refresh', req.cookies.token);
-    if (!refreshToken) return next(new ErrorResponse(`Token inválido.`, 401));
+    if (!refreshToken) return next(new ErrorResponse(`Token inválido.`, 404));
     
     // Get logged user to create access JWT
     const user = await User.findById(refreshToken.user);

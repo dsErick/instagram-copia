@@ -8,5 +8,15 @@ export default [
         path: '/register',
         name: 'Register',
         component: () => import(/* webpackChunkName: Register */'@/views/auth/Register')
+    },
+    {
+        path: '/emailsent',
+        name: 'EmailSent',
+        component: () => import(/* webpackChunkName: EmailSent */'@/views/auth/EmailSent')
+    },
+    {
+        path: '/accountverification/:token',
+        name: 'AccountVerification',
+        component: () => import(/* webpackChunkName: AccountVerification */'@/views/auth/AccountVerification')
     }
 ];
