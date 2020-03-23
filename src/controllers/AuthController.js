@@ -127,17 +127,22 @@ exports.login = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/auth/logout
 // @access  Private
 exports.logout = asyncHandler(async (req, res, next) => {
-    const refreshToken = await Token.matchToken(req.cookies.token, 'refresh', null, req.user.id);
+    const refreshToken = await Token.matchToken(req.cookies.refreshToken, 'refresh', req.cookies.token, req.user.id);
 
     await refreshToken.remove();
 
-    res.status(200).cookie('token', undefined, {
+    const options = {
         expires: new Date(Date.now() + 10 * 1000),
         httpOnly: true
-    }).json({
-        success: true,
-        data: {}
-    })
+    }
+
+    res.status(200)
+        .cookie('refreshToken', undefined, options)
+        .cookie('token', undefined, options)
+        .json({
+            success: true,
+            data: {}
+        })
 });
 
 // @desc    Get logged in user
@@ -157,10 +162,10 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getAccessToken = asyncHandler(async (req, res, next) => {
     // Check for refresh token and access token
-    if (!req.cookies.token || !req.body.token) return next(new ErrorResponse(`Para acessar esta rota é necessário fazer login.`, 401));
+    if (!req.cookies.refreshToken || !req.cookies.token) return next(new ErrorResponse(`Para acessar esta rota é necessário fazer login.`, 401));
 
-    // Check for refresh token in cookies
-    let refreshToken = await Token.matchToken(req.cookies.token, 'refresh', req.body.token);
+    // Check for refresh token
+    let refreshToken = await Token.matchToken(req.cookies.refreshToken, 'refresh', req.cookies.token);
     if (!refreshToken) return next(new ErrorResponse(`Token inválido.`, 401));
     
     // Get logged user to create access JWT
@@ -173,10 +178,20 @@ exports.getAccessToken = asyncHandler(async (req, res, next) => {
     refreshToken.jwt = token;
     await refreshToken.save();
     
-    res.status(200).json({
-        success: true,
-        token
-    }) 
+    const options = {
+        // expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
+        httpOnly: true,
+        SameSite: 'None'
+    };
+    
+    // Set secure cookie if production mode
+    if (process.env.NODE_ENV === 'production') options.secure = true;
+    
+    res.status(200)
+        .cookie('token', token, options).json({
+            success: true,
+            token
+        }) 
 });
 
 // @desc    Update user details
@@ -313,8 +328,11 @@ const sendTokenResponse = asyncHandler(async (user, statusCode, res) => {
     // Set secure cookie if production mode
     if (process.env.NODE_ENV === 'production') options.secure = true;
     
-    res.status(statusCode).cookie('token', refreshToken, options).json({
-        success: true,
-        token
-    })
+    res.status(statusCode)
+        .cookie('refreshToken', refreshToken, options)
+        .cookie('token', token, options)
+        .json({
+            success: true,
+            token
+        })
 });

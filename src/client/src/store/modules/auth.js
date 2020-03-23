@@ -1,5 +1,5 @@
 import router from '@/router';
-import { login, getMe, getAccessToken } from '@/services/AuthService';
+import { login, getMe, getAccessToken, logoutUser } from '@/services/AuthService';
 
 const state = {
     token: '',
@@ -54,6 +54,19 @@ const actions = {
             // Reset Errors
             commit('errors/resetErrors', null, { root: true });
         } catch (err) {
+            dispatch('errors/setErrors', err, { root: true });
+        }
+    },
+    async logoutUser({ dispatch, commit }) {
+        try {
+            const data = await logoutUser();
+
+            // Check for any error
+            if (!data.success) throw data.error;
+
+            commit('reset');
+        } catch (err) {
+            router.push({ name: 'Login' });
             dispatch('errors/setErrors', err, { root: true });
         }
     }
