@@ -268,11 +268,11 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     const token = await Token.createToken(user, 10, 'resetPassword');
 
     // Email options
-    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${token}`;
+    const resetUrl = `${req.protocol}://192.168.88.156:8080/resetpassword/${token}`;
     const options = {
         email: user.email,
         subject: `Redefinição de senha do Instagram`,
-        message: `Recebemos uma solicitação para redefinir a senha de sua conta.\nCaso você tenha solicitado uma redefinição faça uma requisição PUT para ${resetUrl}.\nSe você não fez essa solicitação, ignore este email.`
+        message: `Recebemos uma solicitação para redefinir a senha de sua conta.\nCaso você tenha solicitado uma redefinição clique no link abaixo.\n${resetUrl}.\nSe você não fez essa solicitação, ignore este email.`
     };
 
     try {
@@ -280,7 +280,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
         
         res.status(200).json({
             success: true,
-            data: `Email enviado com sucesso para ${user.email}`
+            data: user.email
         })
     } catch (err) {
         await token.remove();

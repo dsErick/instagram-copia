@@ -9,7 +9,7 @@
         <form @submit.prevent="onSubmit">
             <div class="form-group text-left">
                 <input id="email" class="form-control" type="text" placeholder="seuemail@gmail.com" v-model="email">
-                <span class="invalid-feedback" role="alert"></span>
+                <span class="invalid-feedback" role="alert"><strong>Informe um email válido</strong></span>
             </div>
 
             <button class="btn btn-primary w-100 mt-3" type="submit">Cadastrar</button>
@@ -38,7 +38,6 @@ export default {
             if (!this.email.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
                 let input = document.getElementById('email');
                 input.classList.add('is-invalid');
-                input.nextSibling.innerHTML = `<strong>Informe um email válido<strong>`;
             } else {
                 this.verifyNewUser({ email: this.email, token: this.$route.params.token});
             }

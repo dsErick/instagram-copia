@@ -18,5 +18,15 @@ export default [
         path: '/accountverification/:token',
         name: 'AccountVerification',
         component: () => import(/* webpackChunkName: AccountVerification */'@/views/auth/AccountVerification')
+    },
+    {
+        path: '/forgotpassword',
+        name: 'ForgotPassword',
+        component: () => import(/* webpackChunkName: ForgotPassword */'@/views/auth/ForgotPassword')
+    },
+    {
+        path: '/resetpassword/:token',
+        name: 'ResetPassword',
+        component: () => import(/* webpackChunkName: ResetPassword */'@/views/auth/ResetPassword')
     }
 ];

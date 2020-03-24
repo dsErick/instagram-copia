@@ -113,7 +113,7 @@ export default {
 }
 .register-card {
     background: #FAFAFA;
-    min-width: 33%;
+    min-width: 66%;
     padding: 48px 24px;
     border: 2px solid #bebcbc;
     border-radius: 5px;

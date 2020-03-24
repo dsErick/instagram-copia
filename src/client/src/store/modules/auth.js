@@ -1,7 +1,7 @@
 import router from '@/router';
-import { register, accountVerification, resendToken, login, getMe, getAccessToken, logout } from '@/services/AuthService';
+import { register, accountVerification, resendToken, login, logout, getMe, getAccessToken, forgotPassword, resetPassword } from '@/services/AuthService';
 
-const authStateHandler = fn => ({dispatch, commit}, params) => Promise.resolve(fn({dispatch, commit}, params)).catch(err => { dispatch('errors/setErrors', err, { root: true }) });
+const asyncHandler = fn => ({dispatch, commit}, params) => Promise.resolve(fn({dispatch, commit}, params)).catch(err => { dispatch('errors/setErrors', err, { root: true }) });
 
 const state = {
     token: '',
@@ -15,7 +15,7 @@ const getters = {
 
 const actions = {
     // @desc    Register User
-    registerUser: authStateHandler(async ({ commit }, user) => {
+    registerUser: asyncHandler(async ({ commit }, user) => {
         const data = await register(user);
 
         // Check for any error
@@ -28,7 +28,7 @@ const actions = {
     }),
 
     // @desc    Account verification
-    verifyNewUser: authStateHandler(async ({ dispatch, commit }, params) => {
+    verifyNewUser: asyncHandler(async ({ dispatch, commit }, params) => {
         const data = await accountVerification(params);
         
         // Check for any error
@@ -43,7 +43,7 @@ const actions = {
     }),
 
     // @desc    Resend Verification Email
-    resendVerificationEmail: authStateHandler(async ({ commit }, email) => {
+    resendVerificationEmail: asyncHandler(async ({ commit }, email) => {
         const data = await resendToken(email);
 
         // Check for any error
@@ -56,7 +56,7 @@ const actions = {
     }),
 
     // @desc    Login User
-    userLogin: authStateHandler(async ({ dispatch, commit }, user) => {
+    userLogin: asyncHandler(async ({ dispatch, commit }, user) => {
         // Get JWT
         const data = await login(user);
 
@@ -71,17 +71,25 @@ const actions = {
         router.push({ name: 'Home' });
     }),
 
-    // @desc    Refresh access token by refresh and jwt on cookies
-    refreshAccessToken: authStateHandler(async ({ dispatch, commit }) => {
-        const data = await getAccessToken();
-        
-        commit('setToken', data.token);
+    // @desc    User logout
+    userLogout: asyncHandler(async ({ dispatch, commit }) => {
+        try {
+            const data = await logout();
 
-        if (data.token) dispatch('getLoggedInUser');
+            // Check for any error
+            if (!data.success) throw data.error;
+
+            commit('reset');
+
+            router.push({ name: 'Login' });
+        } catch (err) {
+            router.push({ name: 'Login' });
+            dispatch('errors/setErrors', err, { root: true });
+        }
     }),
 
     // @desc    Get logged in user info and set to state
-    getLoggedInUser: authStateHandler(async ({ commit }) => {
+    getLoggedInUser: asyncHandler(async ({ commit }) => {
         const data = await getMe();
 
         // Check for any error
@@ -94,21 +102,40 @@ const actions = {
         commit('errors/resetErrors', null, { root: true });
     }),
     
-    // @desc    User logout
-    logoutUser: authStateHandler(async ({ dispatch, commit }) => {
-        try {
-            const data = await logout();
+    // @desc    Refresh access token by refresh and jwt on cookies
+    refreshAccessToken: asyncHandler(async ({ dispatch, commit }) => {
+        const data = await getAccessToken();
+        
+        commit('setToken', data.token);
 
-            // Check for any error
-            if (!data.success) throw data.error;
+        if (data.token) dispatch('getLoggedInUser');
+    }),
 
-            commit('reset');
-            
-            router.push({ name: 'Login' });
-        } catch (err) {
-            router.push({ name: 'Login' });
-            dispatch('errors/setErrors', err, { root: true });
-        }
+    // @desc    Send reset password email to user
+    sendForgotPasswordEmail: asyncHandler(async ({commit}, email) => {
+        const data = await forgotPassword(email);
+
+        // Check for any error
+        if (!data.success) throw data.error;
+        
+        commit('errors/resetErrors', null, { root: true });
+
+        return data.data;
+    }),
+
+    // @desc    Reset user account password
+    resetUserPassword: asyncHandler(async ({dispatch, commit}, user) => {
+        const data = await resetPassword(user);
+
+        // Check for any error
+        if (!data.success) throw data.error;
+
+        // Set token
+        commit('setToken', data.token);
+
+        await dispatch('getLoggedInUser');
+
+        router.push({ name: 'Home' });
     })
 };
 

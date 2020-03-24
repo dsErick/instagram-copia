@@ -5,7 +5,7 @@
             <h1>Home</h1>
         </div>
         <div class="col-sm-4 text-right">
-            <button @click="logoutUser" class="btn btn-link">Sair</button>
+            <button @click="userLogout" class="btn btn-link">Sair</button>
         </div>
     </div>
     <Errors />
@@ -24,7 +24,7 @@ export default {
     },
     methods: {
         ...mapActions(['ActionGetPosts']),
-        ...mapActions('auth', ['logoutUser'])
+        ...mapActions('auth', ['userLogout'])
     },
     async created() {
         this.ActionGetPosts();

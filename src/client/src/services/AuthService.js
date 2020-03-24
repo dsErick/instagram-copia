@@ -28,7 +28,7 @@ export const accountVerification = servicesHandler(async (params) => {
     return data;
 });
 
-// @desc    
+// @desc    Resend verification email
 // @access  Public
 export const resendToken = servicesHandler(async (email) => {
     const { data } = await http.put(`/auth/resendtoken`, { email });
@@ -50,6 +50,16 @@ export const login = servicesHandler(async user => {
     return data;
 });
 
+// @desc    Logout user
+// @access  private
+export const logout = servicesHandler(async () => {
+    const { data } = await http.get('/auth/logout');
+
+    return data;
+});
+
+// @desc    Get logged in user details
+// @access  Private
 export const getMe = servicesHandler(async () => {
     const { data } = await http.get('/auth/me');
 
@@ -67,10 +77,24 @@ export const getAccessToken = servicesHandler(async () => {
     return data;
 });
 
-// @desc    Logout user
-// @access  private
-export const logout = servicesHandler(async () => {
-    const { data } = await http.get('/auth/logout');
+// @desc    Send reset password email to user
+// @access  Public
+export const forgotPassword = servicesHandler(async email => {
+    const { data } = await http.post('/auth/forgotpassword', { email });
 
+    return data;
+});
+
+// @desc    Reset User account password 
+// @access  Public
+export const resetPassword = servicesHandler(async user => {
+    const { data } = await http.put(`/auth/resetpassword/${user.token}`, {
+        email: user.email,
+        password: user.password
+    });
+
+    // Set Authorization header
+    http.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+    
     return data;
 });

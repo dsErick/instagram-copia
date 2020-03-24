@@ -7,6 +7,7 @@ import auth from './routes/auth';
 Vue.use(VueRouter);
 
 const router = new VueRouter({
+    // mode: 'history',
     routes: [
         ...auth,
         {
@@ -16,6 +17,10 @@ const router = new VueRouter({
                 requiresAuth: true
             },
             component: () => import(/* webpackChunkName: Home */'@/views/Home')
+        },
+        {
+            path: '*',
+            component: () => import('@/views/404')
         }
     ]
 });
