@@ -8,4 +8,9 @@ export const getPosts = async () => {
     } catch (err) {
         return err.response;
     }
-} 
+}
+
+export const addComment = async (params) => {
+    // const { data } = await http.post(`/posts/${params.post}/comments`);
+    console.log(params);
+}

@@ -9,6 +9,7 @@ const Post = require('../models/Post');
 // @access  Public
 exports.getPosts = asyncHandler(async (req, res, next) => {
     const posts = await Post.find(req.params.userId ? { user: req.params.userId } : {}).populate([
+        'commentsCount',
         { path: 'comments', populate: { path: 'user', select: 'username' }, sort: "-createdAt", justOne: true },
         { path: 'user', select: 'username profilePhoto' }
     ]).sort('-createdAt');
@@ -54,11 +55,15 @@ exports.addPost = asyncHandler(async (req, res, next) => {
 
     const post = await Post.create(req.body);
     
+    // Create user folder if not exists
+    if (!fs.existsSync(`${process.env.POST_IMAGE_PATH}/${req.user.id}`))
+        fs.mkdirSync(`${process.env.POST_IMAGE_PATH}/${req.user.id}`);
+
     // Resize and save image
     await sharp(req.files.image.data)
         .resize(1080)
         .jpeg({ quality: 100, chromaSubsampling: '4:4:4' })
-        .toFile(`${process.env.POST_IMAGE_PATH}/${imageName}`);
+        .toFile(`${process.env.POST_IMAGE_PATH}/${req.user.id}/${imageName}`);
 
     res.status(200).json({
         success: true,
@@ -100,7 +105,7 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
     if (post.user.toString() !== req.user.id && req.user.role !== 'admin') return next(new ErrorResponse(`Você não é autorizado a apagar este post.`, 401));
 
     // Delete image
-    fs.unlinkSync(`${process.env.POST_IMAGE_PATH}/${post.image}`);
+    fs.unlinkSync(`${process.env.POST_IMAGE_PATH}/${req.user.id}/${post.image}`);
 
     // Delete post
     await post.remove();

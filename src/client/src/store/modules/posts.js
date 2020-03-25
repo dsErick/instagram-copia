@@ -1,4 +1,4 @@
-import { getPosts } from '../../services/PostService';
+import { getPosts, addComment } from '../../services/PostService';
 
 const postsHandler = fn => ({ dispatch, commit}) => {
     Promise.resolve(fn(({dispatch, commit}))).catch(err => {
@@ -21,7 +21,12 @@ const actions = {
         if (!data.success) throw data;
         
         commit('setPosts', data.data);
-    })
+    }),
+
+    async addCommentToPost({commit}, params) {
+        const data = await addComment(params);
+        console.log(commit, data);
+    } 
 };
 
 const mutations = {

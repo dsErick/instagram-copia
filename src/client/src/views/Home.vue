@@ -20,8 +20,8 @@
             </header>
 
             <div class="post-picture-wrapper">
-                <router-link :to="`/${post._id}`">
-                    <img class="post-picture" :src="`http://192.168.88.146:5000/media/posts/${post.image}`" alt="Post">
+                <router-link :to="`/post/${post._id}`">
+                    <img class="post-picture" :src="`http://192.168.88.146:5000/media/posts/${post.user._id}/${post.image}`" alt="Post">
                 </router-link>
             </div>
 
@@ -35,8 +35,8 @@
                     </div>
                     <strong class="d-block">{{ post.createdAt | moment("from") }}</strong>
                 </div>
-
-                <router-link v-if="post.comments.length != 0" class="text-muted" :to="`/${post._id}`">Ver todos os comentários</router-link>
+                
+                <router-link v-if="post.commentsCount > 1" class="text-muted" :to="`/post/${post._id}`">Ver todos os {{ post.commentsCount }} comentários</router-link>
                 <div class="post-comments" v-for="comment in post.comments" :key="comment.id">
                     <router-link :to="`/${comment.user.username}`" class="user-link">
                         <strong>{{ comment.user.username }}</strong>
@@ -45,7 +45,7 @@
                 </div>
 
                 <div class="post-add-comment">
-                    <form>
+                    <form @submit.prevent="onSubmit($event, post._id)">
                         <input type="text" placeholder="Adicione um comentário...">
                         <button type="submit" class="btn btn-link">Publicar</button>
                     </form>
@@ -67,8 +67,11 @@ export default {
         Errors, Navbar
     },
     methods: {
-        ...mapActions(['ActionGetPosts']),
-        ...mapActions('auth', ['userLogout'])
+        ...mapActions(['ActionGetPosts', 'addCommentToPost']),
+        ...mapActions('auth', ['userLogout']),
+        onSubmit(e, post) {
+            if (e.target.elements[0] && e.target.elements[0].value !== '') this.addCommentToPost({ comment: e.target.elements[0].value, post });
+        }
     },
     async created() {
         this.ActionGetPosts();
@@ -100,7 +103,7 @@ article header {
 article header img.profile-picture {
     width: 2.1rem;
     height: 2.1rem;
-    border: 1px solid rgba(190, 187, 187, .2);
+    border: 1px solid rgba(190, 187, 187, .5);
     border-radius: 50%;
 }
 article header > h4 {
@@ -165,7 +168,7 @@ article .post-body .post-add-comment form button {
 }
 @media (max-width: 547px){
     .home div.posts-wrapper {
-        width: 92%;
+        width: 100%;
     }
 }
 </style>
