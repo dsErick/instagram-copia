@@ -8,7 +8,10 @@ const Post = require('../models/Post');
 // @route   GET /api/v1/posts
 // @access  Public
 exports.getPosts = asyncHandler(async (req, res, next) => {
-    const posts = await Post.find(req.params.userId ? { user: req.params.userId } : {}).populate('comments').sort('-createdAt');
+    const posts = await Post.find(req.params.userId ? { user: req.params.userId } : {}).populate([
+        { path: 'comments', populate: { path: 'user', select: 'username' }, sort: "-createdAt", justOne: true },
+        { path: 'user', select: 'username profilePhoto' }
+    ]).sort('-createdAt');
     
     res.status(200).json({
         success: true,
@@ -36,7 +39,7 @@ exports.getPost = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.addPost = asyncHandler(async (req, res, next) => {
     req.body.user = req.user.id;
-    req.body.author = req.user.name;
+    req.body.author = req.user.username;
 
     // Check for image
     if (!req.files && !req.files.image) return next(new ErrorResponse(`Informe uma imagem para a postagem`, 400));
