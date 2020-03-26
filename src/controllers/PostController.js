@@ -109,7 +109,7 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
     if (post.user.toString() !== req.user.id && req.user.role !== 'admin') return next(new ErrorResponse(`Você não é autorizado a apagar este post.`, 401));
 
     // Delete image
-    fs.unlinkSync(`${process.env.POST_IMAGE_PATH}/${req.user.id}/${post.image}`);
+    fs.unlinkSync(`${process.env.POST_IMAGE_PATH}/${post.user}/${post.image}`);
 
     // Delete post
     await post.remove();

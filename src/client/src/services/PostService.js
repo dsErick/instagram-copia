@@ -14,6 +14,12 @@ export const getPost = servicesHandler(async (post) => {
     return data;
 })
 
+export const deletePost = servicesHandler(async (post) => {
+    const { data } = await http.delete(`/posts/${post}`);
+
+    return data;
+})
+
 export const addComment = servicesHandler(async (params) => {
     const { data } = await http.post(`/posts/${params.post}/comments`, { body: params.body });
     

@@ -1,12 +1,10 @@
-import { getPosts, getPost, addComment, deleteComment } from '../../services/PostService';
 import router from '@/router';
+import { getPosts, getPost, deletePost, addComment, deleteComment } from '../../services/PostService';
 
 const postsHandler = fn => ({dispatch, commit}, params) => {
     Promise.resolve(fn({dispatch, commit}, params)).catch(err => {
-        // if (err.status === 401) return dispatch('auth/refreshAccessToken', null, { root: true });
-        console.log(err);
         dispatch('errors/setErrors', err, { root: true });
-    })
+    });
 };
 
 const state = {
@@ -38,6 +36,15 @@ const actions = {
         commit('errors/resetErrors', null, { root: true });
     }),
 
+    deletePost: postsHandler(async ({commit}, post) => {
+        const data = await deletePost(post);
+
+        if (!data.success) throw data.error;
+
+        if (router.currentRoute.name === 'ShowPost') return router.push({ name: 'Home' });
+        commit('deletePost', post);
+    }),
+
     addCommentToPost: postsHandler(async ({dispatch}, params) => {
         const data = await addComment(params);
 
@@ -60,7 +67,8 @@ const actions = {
 };
 
 const mutations = {
-    setPosts: (state, posts) => state.posts = posts
+    setPosts: (state, posts) => state.posts = posts,
+    deletePost: (state, post) => state.posts = state.posts.filter(el => el._id !== post)
 };
 
 export default {

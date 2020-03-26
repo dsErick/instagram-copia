@@ -8,14 +8,14 @@
                 <router-link :to="`/${post.user.username}`">
                     <img class="profile-picture" :src="`http://192.168.88.146:5000/media/profiles/${post.user.profilePhoto}`" alt="Profile Picture">
                 </router-link>
-                <h4>
+                <h4 class="w-100">
                     <router-link :to="`/${post.user.username}`" class="user-link">
                         <strong>{{ post.user.username }}</strong>
                     </router-link>
                     <br>
                     {{ post.place }}
                 </h4>
-                
+                <span v-if="getUser._id === post.user._id || getUser.role === 'admin'" @click="deletePost(post._id)" class="delete-post flex-shrink-1"><i class="icon ui-1_trash"></i></span>
             </header>
 
             <div class="post-picture-wrapper">
@@ -69,7 +69,7 @@ export default {
         Errors, Navbar
     },
     methods: {
-        ...mapActions(['getAllPosts', 'addCommentToPost', 'deletePostComment']),
+        ...mapActions(['getAllPosts', 'deletePost', 'addCommentToPost', 'deletePostComment']),
         onSubmit(e, post) {
             if (e.target.elements[0] && e.target.elements[0].value !== '') this.addCommentToPost({ body: e.target.elements[0].value, post });
             e.target.elements[0].value = '';
@@ -115,6 +115,10 @@ article header > h4 {
     margin: 0;
     margin-left: 16px;
     font-size: 0.8em;
+}
+article header .delete-post {
+    color: #DC3545;
+    cursor: pointer;
 }
 
 article .post-picture-wrapper {

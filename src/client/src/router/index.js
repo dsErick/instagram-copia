@@ -29,7 +29,7 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        if (!store.getters['auth/getToken']) await store.dispatch('auth/refreshAccessToken', null, { root: true });
+        if (!store.getters['auth/getToken'] || store.getters['errors/getErrors']) await store.dispatch('auth/refreshAccessToken', null, { root: true });
         if (store.getters['auth/getToken']) return next();
 
         next({ name: 'Login' });
