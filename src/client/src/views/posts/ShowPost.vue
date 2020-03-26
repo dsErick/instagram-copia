@@ -28,9 +28,9 @@
                 <div class="post-description mb-3">
                     <strong>{{ getPosts.user.username }}</strong>
                     {{ getPosts.description }}<br>
-                    <div class="d-inline" v-for="hashtag in getPosts.hashtags" :key="hashtag">
+                    <!-- <div class="d-inline" v-for="hashtag in getPosts.hashtags" :key="hashtag">
                         #{{ hashtag }}
-                    </div>
+                    </div> -->
                     <strong class="d-block">{{ getPosts.createdAt | moment("from") }}</strong>
                 </div>
 

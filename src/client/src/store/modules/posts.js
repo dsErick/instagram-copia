@@ -1,5 +1,5 @@
 import router from '@/router';
-import { getPosts, getPost, deletePost, addComment, deleteComment } from '../../services/PostService';
+import { getPosts, getPost, createPost, deletePost, addComment, deleteComment } from '../../services/PostService';
 
 const postsHandler = fn => ({dispatch, commit}, params) => {
     Promise.resolve(fn({dispatch, commit}, params)).catch(err => {
@@ -36,6 +36,16 @@ const actions = {
         commit('errors/resetErrors', null, { root: true });
     }),
 
+    createPost: postsHandler(async ({commit}, post) => {
+        const data = await createPost(post);
+        
+        if (!data.success) throw data.error;
+        
+        router.push({ name: 'Home' });
+        
+        commit('errors/resetErrors', null, { root: true });
+    }),
+
     deletePost: postsHandler(async ({commit}, post) => {
         const data = await deletePost(post);
 
@@ -68,6 +78,7 @@ const actions = {
 
 const mutations = {
     setPosts: (state, posts) => state.posts = posts,
+    addPost: (state, post) => state.posts.unshift(post),
     deletePost: (state, post) => state.posts = state.posts.filter(el => el._id !== post)
 };
 

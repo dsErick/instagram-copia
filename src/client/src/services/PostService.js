@@ -14,6 +14,17 @@ export const getPost = servicesHandler(async (post) => {
     return data;
 })
 
+export const createPost = servicesHandler(async (post) => {
+    const { data } = await http.post('/posts', post, { headers: {'Content-type': 'multipart/form-data'} });
+    // const { data } = await http({
+    //     method: 'post',
+    //     url: 'posts',
+    //     data
+    // })
+
+    return data;
+})
+
 export const deletePost = servicesHandler(async (post) => {
     const { data } = await http.delete(`/posts/${post}`);
 
