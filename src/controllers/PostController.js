@@ -40,7 +40,7 @@ exports.getPost = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.addPost = asyncHandler(async (req, res, next) => {
     req.body.user = req.user.id;
-    req.body.author = req.user.username;
+    // req.body.author = req.user.username;
 
     // Check for image
     if (!req.files && !req.files.image) return next(new ErrorResponse(`Informe uma imagem para a postagem`, 400));

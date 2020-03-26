@@ -6,11 +6,26 @@ export const getPosts = async () => {
 
         return data;
     } catch (err) {
-        return err.response;
+        return err.response.data;
     }
 }
 
 export const addComment = async (params) => {
-    // const { data } = await http.post(`/posts/${params.post}/comments`);
-    console.log(params);
+    try {
+        const { data } = await http.post(`/posts/${params.post}/comments`, { body: params.body });
+        
+        return data;
+    } catch (err) {
+        return err.response.data;
+    }
+}
+
+export const deleteComment = async (params) => {
+    try {
+        const { data } = await http.delete(`/posts/${params.post}/comments/${params.comment}`);
+        
+        return data;
+    } catch (err) {
+        return err.response.data;
+    }
 }

@@ -11,7 +11,7 @@
                 </router-link>
                 <h4>
                     <router-link :to="`/${post.user.username}`" class="user-link">
-                        <strong>{{ post.author }}</strong>
+                        <strong>{{ post.user.username }}</strong>
                     </router-link>
                     <br>
                     {{ post.place }}
@@ -28,20 +28,23 @@
             <div class="post-body">
                 <strong>{{ post.likes }} curtidas</strong>
                 <div class="post-description mb-3">
-                    <strong>{{ post.author }}</strong>
+                    <strong>{{ post.user.username }}</strong>
                     {{ post.description }}<br>
                     <div class="d-inline" v-for="hashtag in post.hashtags" :key="hashtag">
                         #{{ hashtag }}
                     </div>
                     <strong class="d-block">{{ post.createdAt | moment("from") }}</strong>
                 </div>
-                
+
                 <router-link v-if="post.commentsCount > 1" class="text-muted" :to="`/post/${post._id}`">Ver todos os {{ post.commentsCount }} comentários</router-link>
                 <div class="post-comments" v-for="comment in post.comments" :key="comment.id">
-                    <router-link :to="`/${comment.user.username}`" class="user-link">
-                        <strong>{{ comment.user.username }}</strong>
-                    </router-link>
-                    {{ comment.body }}
+                    <span class="comment-body">
+                        <router-link :to="`/${comment.user.username}`" class="user-link">
+                            <strong>{{ comment.user.username }}</strong>
+                        </router-link>
+                        {{ comment.body }}
+                    </span>
+                    <span v-if="getUser._id === comment.user.id || getUser.role === 'admin'" @click="deletePostComment({comment: comment._id, post: post._id})" class="comment-options"><i class="icon ui-1_trash"></i></span>
                 </div>
 
                 <div class="post-add-comment">
@@ -67,16 +70,19 @@ export default {
         Errors, Navbar
     },
     methods: {
-        ...mapActions(['ActionGetPosts', 'addCommentToPost']),
+        ...mapActions(['ActionGetPosts', 'addCommentToPost', 'deletePostComment']),
         ...mapActions('auth', ['userLogout']),
         onSubmit(e, post) {
-            if (e.target.elements[0] && e.target.elements[0].value !== '') this.addCommentToPost({ comment: e.target.elements[0].value, post });
+            if (e.target.elements[0] && e.target.elements[0].value !== '') this.addCommentToPost({ body: e.target.elements[0].value, post });
         }
     },
     async created() {
         this.ActionGetPosts();
     },
-    computed: mapGetters(['getPosts']),
+    computed: {
+        ...mapGetters(['getPosts']),
+        ...mapGetters('auth', ['getUser'])
+    },
 }
 </script>
 
@@ -101,8 +107,8 @@ article header {
     line-height: 2.1rem;
 }
 article header img.profile-picture {
-    width: 2.1rem;
-    height: 2.1rem;
+    max-width: 2.1rem;
+    max-height: 2.1rem;
     border: 1px solid rgba(190, 187, 187, .5);
     border-radius: 50%;
 }
@@ -130,6 +136,14 @@ article .post-body .post-description {
     font-size: 0.9em;
 }
 
+article .post-body .post-comments { display: flex; }
+article .post-body .post-comments .comment-body { flex: 10; }
+article .post-body .post-comments .comment-options {
+    text-align: right;
+    flex: 1;
+    color: #DC3545;
+    cursor: pointer;
+}
 article .post-body .post-add-comment form {
     display: flex;
     margin-top: 4px;

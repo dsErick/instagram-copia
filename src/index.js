@@ -24,7 +24,7 @@ const app = express();
 // Middlewares
 const limiter = rateLimit({
     windowMs: 5 * 60 * 1000,
-    max: 50
+    max: 75
 });
 app.use(
     express.json(),         // Body Parser

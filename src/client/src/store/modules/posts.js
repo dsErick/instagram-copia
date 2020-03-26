@@ -1,8 +1,10 @@
-import { getPosts, addComment } from '../../services/PostService';
+import { getPosts, addComment, deleteComment } from '../../services/PostService';
 
-const postsHandler = fn => ({ dispatch, commit}) => {
-    Promise.resolve(fn(({dispatch, commit}))).catch(err => {
-        if (err.status === 401) dispatch('auth/refreshAccessToken', null, { root: true });
+const postsHandler = fn => ({dispatch, commit}, params) => {
+    Promise.resolve(fn({dispatch, commit}, params)).catch(err => {
+        // if (err.status === 401) return dispatch('auth/refreshAccessToken', null, { root: true });
+        console.log(err);
+        dispatch('errors/setErrors', err, { root: true });
     })
 };
 
@@ -15,18 +17,31 @@ const getters = {
 };
 
 const actions = {
-    ActionGetPosts: postsHandler(async function({ commit }) {
+    ActionGetPosts: postsHandler(async ({ commit }) => {
         const data = await getPosts();
         
-        if (!data.success) throw data;
+        if (!data.success) throw data.error;
         
         commit('setPosts', data.data);
     }),
 
-    async addCommentToPost({commit}, params) {
+    addCommentToPost: postsHandler(async ({dispatch}, params) => {
         const data = await addComment(params);
-        console.log(commit, data);
-    } 
+
+        if (!data.success) throw data.error;
+
+        // Recarrega os posts
+        dispatch('ActionGetPosts');
+    }),
+
+    deletePostComment: postsHandler(async ({dispatch}, params) => {
+        const data = await deleteComment(params);
+
+        if (!data.success) throw data.error;
+
+        // Recarrega os posts
+        dispatch('ActionGetPosts');
+    })
 };
 
 const mutations = {
