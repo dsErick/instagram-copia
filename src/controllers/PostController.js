@@ -25,7 +25,11 @@ exports.getPosts = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/posts/:id
 // @access  Public
 exports.getPost = asyncHandler(async (req, res, next) => {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.id).populate([
+        'commentsCount',
+        { path: 'comments', populate: { path: 'user', select: 'username' }, sort: "-createdAt" },
+        { path: 'user', select: 'username profilePhoto' }
+    ]);
 
     if (!post) return next(new ErrorResponse(`Não foi encontrado nenhum post com o id ${req.params.id}`));
 

@@ -1,4 +1,5 @@
-import { getPosts, addComment, deleteComment } from '../../services/PostService';
+import { getPosts, getPost, addComment, deleteComment } from '../../services/PostService';
+import router from '@/router';
 
 const postsHandler = fn => ({dispatch, commit}, params) => {
     Promise.resolve(fn({dispatch, commit}, params)).catch(err => {
@@ -17,12 +18,24 @@ const getters = {
 };
 
 const actions = {
-    ActionGetPosts: postsHandler(async ({ commit }) => {
+    getAllPosts: postsHandler(async ({ commit }) => {
         const data = await getPosts();
         
         if (!data.success) throw data.error;
         
         commit('setPosts', data.data);
+
+        commit('errors/resetErrors', null, { root: true });
+    }),
+
+    getSinglePost: postsHandler(async ({commit}, post) => {
+        const data = await getPost(post);
+        
+        if (!data.success) throw data.error;
+        
+        commit('setPosts', data.data);
+
+        commit('errors/resetErrors', null, { root: true });
     }),
 
     addCommentToPost: postsHandler(async ({dispatch}, params) => {
@@ -31,7 +44,8 @@ const actions = {
         if (!data.success) throw data.error;
 
         // Recarrega os posts
-        dispatch('ActionGetPosts');
+        if (router.currentRoute.name === 'Home') dispatch('getAllPosts');
+        if (router.currentRoute.name === 'ShowPost') dispatch('getSinglePost', router.currentRoute.params.id);
     }),
 
     deletePostComment: postsHandler(async ({dispatch}, params) => {
@@ -40,7 +54,8 @@ const actions = {
         if (!data.success) throw data.error;
 
         // Recarrega os posts
-        dispatch('ActionGetPosts');
+        if (router.currentRoute.name === 'Home') dispatch('getAllPosts');
+        if (router.currentRoute.name === 'ShowPost') dispatch('getSinglePost', router.currentRoute.params.id);
     })
 };
 

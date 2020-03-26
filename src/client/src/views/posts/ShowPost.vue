@@ -1,53 +1,51 @@
 <template>
-<div class="home">
+<div>
     <Navbar />
     <Errors />
-    <div v-if="getPosts.length > 0" class="posts-wrapper">
-        <article v-for="post in getPosts" :key="post._id" class="my-5">
+
+    <div class="post d-flex align-items-center justify-content-center">
+        <article v-if="getPosts._id">
             <header class="d-flex align-items-center">
-                <router-link :to="`/${post.user.username}`">
-                    <img class="profile-picture" :src="`http://192.168.88.146:5000/media/profiles/${post.user.profilePhoto}`" alt="Profile Picture">
+                <router-link :to="`/${getPosts.user.username}`">
+                    <img class="profile-picture" :src="`http://192.168.88.146:5000/media/profiles/${getPosts.user.profilePhoto}`" alt="Profile Picture">
                 </router-link>
                 <h4>
-                    <router-link :to="`/${post.user.username}`" class="user-link">
-                        <strong>{{ post.user.username }}</strong>
+                    <router-link :to="`/${getPosts.user.username}`" class="user-link">
+                        <strong>{{ getPosts.user.username }}</strong>
                     </router-link>
                     <br>
-                    {{ post.place }}
+                    {{ getPosts.place }}
                 </h4>
-                
             </header>
 
             <div class="post-picture-wrapper">
-                <router-link :to="`/posts/${post._id}`">
-                    <img class="post-picture" :src="`http://192.168.88.146:5000/media/posts/${post.user._id}/${post.image}`" alt="Post">
-                </router-link>
+                <img class="post-picture" :src="`http://192.168.88.146:5000/media/posts/${getPosts.user._id}/${getPosts.image}`" alt="Post">
             </div>
-
+            
             <div class="post-body">
-                <strong>{{ post.likes }} curtidas</strong>
+                <strong>{{ getPosts.likes }} curtidas</strong>
                 <div class="post-description mb-3">
-                    <strong>{{ post.user.username }}</strong>
-                    {{ post.description }}<br>
-                    <div class="d-inline" v-for="hashtag in post.hashtags" :key="hashtag">
+                    <strong>{{ getPosts.user.username }}</strong>
+                    {{ getPosts.description }}<br>
+                    <div class="d-inline" v-for="hashtag in getPosts.hashtags" :key="hashtag">
                         #{{ hashtag }}
                     </div>
-                    <strong class="d-block">{{ post.createdAt | moment("from") }}</strong>
+                    <strong class="d-block">{{ getPosts.createdAt | moment("from") }}</strong>
                 </div>
 
-                <router-link v-if="post.commentsCount > 1" class="text-muted" :to="`/posts/${post._id}`">Ver todos os {{ post.commentsCount }} comentários</router-link>
-                <div class="post-comments" v-for="comment in post.comments" :key="comment.id">
+                <span class="text-muted">{{ getPosts.commentsCount }} comentários</span>
+                <div class="post-comments" v-for="comment in getPosts.comments" :key="comment.id">
                     <span class="comment-body">
                         <router-link :to="`/${comment.user.username}`" class="user-link">
                             <strong>{{ comment.user.username }}</strong>
                         </router-link>
                         {{ comment.body }}
                     </span>
-                    <span v-if="getUser._id === comment.user.id || getUser.role === 'admin'" @click="deletePostComment({comment: comment._id, post: post._id})" class="comment-options"><i class="icon ui-1_trash"></i></span>
+                    <span v-if="getUser._id === comment.user.id || getUser.role === 'admin'" @click="deletePostComment({comment: comment._id, post: getPosts._id})" class="comment-options"><i class="icon ui-1_trash"></i></span>
                 </div>
 
                 <div class="post-add-comment">
-                    <form @submit.prevent="onSubmit($event, post._id)">
+                    <form @submit.prevent="onSubmit($event, getPosts._id)">
                         <input type="text" placeholder="Adicione um comentário...">
                         <button type="submit" class="btn btn-link">Publicar</button>
                     </form>
@@ -64,19 +62,19 @@ import Navbar from '@/components/layout/Navbar';
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
-    name: 'Home',
+    name: 'ShowPost',
     components: {
         Errors, Navbar
     },
     methods: {
-        ...mapActions(['getAllPosts', 'addCommentToPost', 'deletePostComment']),
+        ...mapActions(['getSinglePost', 'addCommentToPost', 'deletePostComment']),
         onSubmit(e, post) {
             if (e.target.elements[0] && e.target.elements[0].value !== '') this.addCommentToPost({ body: e.target.elements[0].value, post });
             e.target.elements[0].value = '';
         }
     },
     async created() {
-        this.getAllPosts();
+        this.getSinglePost(this.$route.params.id);
     },
     computed: {
         ...mapGetters(['getPosts']),
@@ -86,19 +84,20 @@ export default {
 </script>
 
 <style scoped>
-.home div.posts-wrapper {
+.post {
     width: 45vw;
-    margin: auto;
+    margin: 48px auto;
 }
-article {
-    border-radius: 5px;
-    box-shadow: 0 0 16px rgba(190, 187, 187, 1);
-}
-
 .user-link {
     text-decoration: none;
     color: #000;
     cursor: pointer;
+}
+
+article {
+    width: 100%;
+    border-radius: 5px;
+    box-shadow: 0 0 16px rgba(190, 187, 187, 1);
 }
 
 article header {
@@ -157,8 +156,9 @@ article .post-body .post-add-comment form button {
     flex: 1;
 }
 
+
 @media (max-width: 1200px){
-    .home div.posts-wrapper {
+    .post {
         width: 53vw;
     }
     article .post-picture-wrapper {
@@ -169,7 +169,7 @@ article .post-body .post-add-comment form button {
     }
 }
 @media (max-width: 992px){
-    .home div.posts-wrapper {
+    .post {
         width: 66vw;
     }
     article .post-picture-wrapper {
@@ -179,8 +179,19 @@ article .post-body .post-add-comment form button {
         max-height: 654px;
     }
 }
+@media (max-width: 767px){
+    .post {
+        width: 78vw;
+    }
+    article .post-picture-wrapper {
+        max-height: 598px;
+    }
+    article .post-picture-wrapper .post-picture {
+        max-height: 598px;
+    }
+}
 @media (max-width: 547px){
-    .home div.posts-wrapper {
+    .post {
         width: 100%;
     }
 }

@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import store from '../store';
 
 import auth from './routes/auth';
+import posts from './routes/posts';
 
 Vue.use(VueRouter);
 
@@ -10,6 +11,7 @@ const router = new VueRouter({
     // mode: 'history',
     routes: [
         ...auth,
+        ...posts,
         {
             path: '/',
             name: 'Home',
