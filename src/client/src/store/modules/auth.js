@@ -108,7 +108,7 @@ const actions = {
         
         commit('setToken', data.token);
 
-        if (data.token) dispatch('getLoggedInUser');
+        if (data.token) await dispatch('getLoggedInUser');
     }),
 
     // @desc    Send reset password email to user

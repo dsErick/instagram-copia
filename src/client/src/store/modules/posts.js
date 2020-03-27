@@ -16,7 +16,7 @@ const getters = {
 };
 
 const actions = {
-    getAllPosts: postsHandler(async ({ commit }) => {
+    getAllPosts: postsHandler(async ({commit}) => {
         const data = await getPosts();
         
         if (!data.success) throw data.error;

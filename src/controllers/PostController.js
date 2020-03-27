@@ -65,8 +65,8 @@ exports.addPost = asyncHandler(async (req, res, next) => {
 
     // Resize and save image
     await sharp(req.files.image.data)
-        .resize(1080)
-        .jpeg({ quality: 100, chromaSubsampling: '4:4:4' })
+        .resize(1080, 1080, { fit: 'inside' })
+        .jpeg({ quality: 90, chromaSubsampling: '4:4:4' })
         .toFile(`${process.env.POST_IMAGE_PATH}/${req.user.id}/${imageName}`);
 
     res.status(200).json({

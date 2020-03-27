@@ -16,12 +16,7 @@ export const getPost = servicesHandler(async (post) => {
 
 export const createPost = servicesHandler(async (post) => {
     const { data } = await http.post('/posts', post, { headers: {'Content-type': 'multipart/form-data'} });
-    // const { data } = await http({
-    //     method: 'post',
-    //     url: 'posts',
-    //     data
-    // })
-
+    
     return data;
 })
 

@@ -36,7 +36,7 @@ app.use(
     hpp(),                  // Prevent query polution
     limiter,                // Limit user requests
     cors({ credentials: true, origin: ['http://192.168.88.146:8080', 'http://localhost:8080'] }),    // CORS
-    express.static(path.join(__dirname, 'public'))  // Static folder
+    express.static(path.join(__dirname, '../public'))  // Static folder
 );
 
 // Morgan log
