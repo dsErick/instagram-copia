@@ -1,11 +1,7 @@
 import router from '@/router';
 import { getPosts, getPost, createPost, deletePost, addComment, deleteComment } from '../../services/PostService';
 
-const postsHandler = fn => ({dispatch, commit}, params) => {
-    Promise.resolve(fn({dispatch, commit}, params)).catch(err => {
-        dispatch('errors/setErrors', err, { root: true });
-    });
-};
+import modulesHandler from '@/utils/modulesHandler';
 
 const state = {
     posts: []
@@ -16,7 +12,7 @@ const getters = {
 };
 
 const actions = {
-    getAllPosts: postsHandler(async ({commit}) => {
+    getAllPosts: modulesHandler(async ({commit}) => {
         const data = await getPosts();
         
         if (!data.success) throw data.error;
@@ -26,7 +22,7 @@ const actions = {
         commit('errors/resetErrors', null, { root: true });
     }),
 
-    getSinglePost: postsHandler(async ({commit}, post) => {
+    getSinglePost: modulesHandler(async ({commit}, post) => {
         const data = await getPost(post);
         
         if (!data.success) throw data.error;
@@ -36,7 +32,7 @@ const actions = {
         commit('errors/resetErrors', null, { root: true });
     }),
 
-    createPost: postsHandler(async ({commit}, post) => {
+    createPost: modulesHandler(async ({commit}, post) => {
         const data = await createPost(post);
         
         if (!data.success) throw data.error;
@@ -46,7 +42,7 @@ const actions = {
         commit('errors/resetErrors', null, { root: true });
     }),
 
-    deletePost: postsHandler(async ({commit}, post) => {
+    deletePost: modulesHandler(async ({commit}, post) => {
         const data = await deletePost(post);
 
         if (!data.success) throw data.error;
@@ -55,7 +51,7 @@ const actions = {
         commit('deletePost', post);
     }),
 
-    addCommentToPost: postsHandler(async ({dispatch}, params) => {
+    addCommentToPost: modulesHandler(async ({dispatch}, params) => {
         const data = await addComment(params);
 
         if (!data.success) throw data.error;
@@ -65,7 +61,7 @@ const actions = {
         if (router.currentRoute.name === 'ShowPost') dispatch('getSinglePost', router.currentRoute.params.id);
     }),
 
-    deletePostComment: postsHandler(async ({dispatch}, params) => {
+    deletePostComment: modulesHandler(async ({dispatch}, params) => {
         const data = await deleteComment(params);
 
         if (!data.success) throw data.error;

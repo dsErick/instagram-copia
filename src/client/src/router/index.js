@@ -4,6 +4,7 @@ import store from '../store';
 
 import auth from './routes/auth';
 import posts from './routes/posts';
+import users from './routes/users';
 
 Vue.use(VueRouter);
 
@@ -12,6 +13,7 @@ const router = new VueRouter({
     routes: [
         ...auth,
         ...posts,
+        ...users,
         {
             path: '/',
             name: 'Home',

@@ -1,6 +1,6 @@
 import http from './';
 
-const servicesHandler = fn => params => Promise.resolve(fn(params)).catch(err => { return err.response.data });
+import servicesHandler from '@/utils/servicesHandler';
 
 export const getPosts = servicesHandler(async () => {
     const { data } = await http.get('/posts');

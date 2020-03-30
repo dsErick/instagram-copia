@@ -1,7 +1,7 @@
 import router from '@/router';
 import { register, accountVerification, resendToken, login, logout, getMe, getAccessToken, forgotPassword, resetPassword } from '@/services/AuthService';
 
-const asyncHandler = fn => ({dispatch, commit}, params) => Promise.resolve(fn({dispatch, commit}, params)).catch(err => { dispatch('errors/setErrors', err, { root: true }) });
+import modulesHandler from '@/utils/modulesHandler';
 
 const state = {
     token: '',
@@ -15,7 +15,7 @@ const getters = {
 
 const actions = {
     // @desc    Register User
-    registerUser: asyncHandler(async ({ commit }, user) => {
+    registerUser: modulesHandler(async ({ commit }, user) => {
         const data = await register(user);
 
         // Check for any error
@@ -28,7 +28,7 @@ const actions = {
     }),
 
     // @desc    Account verification
-    verifyNewUser: asyncHandler(async ({ dispatch, commit }, params) => {
+    verifyNewUser: modulesHandler(async ({ dispatch, commit }, params) => {
         const data = await accountVerification(params);
         
         // Check for any error
@@ -43,7 +43,7 @@ const actions = {
     }),
 
     // @desc    Resend Verification Email
-    resendVerificationEmail: asyncHandler(async ({ commit }, email) => {
+    resendVerificationEmail: modulesHandler(async ({ commit }, email) => {
         const data = await resendToken(email);
 
         // Check for any error
@@ -56,7 +56,7 @@ const actions = {
     }),
 
     // @desc    Login User
-    userLogin: asyncHandler(async ({ dispatch, commit }, user) => {
+    userLogin: modulesHandler(async ({ dispatch, commit }, user) => {
         // Get JWT
         const data = await login(user);
 
@@ -72,7 +72,7 @@ const actions = {
     }),
 
     // @desc    User logout
-    userLogout: asyncHandler(async ({ dispatch, commit }) => {
+    userLogout: modulesHandler(async ({ dispatch, commit }) => {
         try {
             const data = await logout();
 
@@ -89,7 +89,7 @@ const actions = {
     }),
 
     // @desc    Get logged in user info and set to state
-    getLoggedInUser: asyncHandler(async ({ commit }) => {
+    getLoggedInUser: modulesHandler(async ({ commit }) => {
         const data = await getMe();
 
         // Check for any error
@@ -103,7 +103,7 @@ const actions = {
     }),
     
     // @desc    Refresh access token by refresh and jwt on cookies
-    refreshAccessToken: asyncHandler(async ({ dispatch, commit }) => {
+    refreshAccessToken: modulesHandler(async ({ dispatch, commit }) => {
         const data = await getAccessToken();
         
         commit('setToken', data.token);
@@ -112,7 +112,7 @@ const actions = {
     }),
 
     // @desc    Send reset password email to user
-    sendForgotPasswordEmail: asyncHandler(async ({commit}, email) => {
+    sendForgotPasswordEmail: modulesHandler(async ({commit}, email) => {
         const data = await forgotPassword(email);
 
         // Check for any error
@@ -124,7 +124,7 @@ const actions = {
     }),
 
     // @desc    Reset user account password
-    resetUserPassword: asyncHandler(async ({dispatch, commit}, user) => {
+    resetUserPassword: modulesHandler(async ({dispatch, commit}, user) => {
         const data = await resetPassword(user);
 
         // Check for any error

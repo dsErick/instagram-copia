@@ -10,7 +10,7 @@ const Post = require('../models/Post');
 exports.getPosts = asyncHandler(async (req, res, next) => {
     const posts = await Post.find(req.params.userId ? { user: req.params.userId } : {}).populate([
         'commentsCount',
-        { path: 'comments', populate: { path: 'user', select: 'username' }, sort: "-createdAt", justOne: true },
+        { path: 'comments', populate: { path: 'user', select: 'username' }, options: { sort: '-createdAt' }, justOne: true },
         { path: 'user', select: 'username profilePhoto' }
     ]).sort('-createdAt');
     
@@ -65,6 +65,7 @@ exports.addPost = asyncHandler(async (req, res, next) => {
 
     // Resize and save image
     await sharp(req.files.image.data)
+        .rotate()
         .resize(1080, 1080, { fit: 'inside' })
         .jpeg({ quality: 90, chromaSubsampling: '4:4:4' })
         .toFile(`${process.env.POST_IMAGE_PATH}/${req.user.id}/${imageName}`);

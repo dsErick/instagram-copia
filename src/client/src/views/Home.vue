@@ -2,7 +2,7 @@
 <div class="home">
     <Navbar />
     <Errors />
-    <div v-if="getPosts.length > 0" class="posts-wrapper">
+    <main v-if="getPosts.length > 0" class="posts-wrapper">
         <article v-for="post in getPosts" :key="post._id" class="my-5">
             <header class="d-flex align-items-center">
                 <router-link :to="`/${post.user.username}`">
@@ -25,7 +25,7 @@
             </div>
 
             <div class="post-body">
-                <strong>{{ post.likes }} curtidas</strong>
+                <!-- <strong>{{ post.likes }} curtidas</strong> -->
                 <div class="post-description mb-3">
                     <strong>{{ post.user.username }}</strong>
                     {{ post.description }}<br>
@@ -54,7 +54,7 @@
                 </div>
             </div>
         </article>
-    </div>
+    </main>
 </div>
 </template>
 
@@ -86,7 +86,7 @@ export default {
 </script>
 
 <style scoped>
-.home div.posts-wrapper {
+.home .posts-wrapper {
     width: 45vw;
     margin: auto;
 }
@@ -161,8 +161,8 @@ article .post-body .post-add-comment form button {
     flex: 1;
 }
 
-@media (max-width: 1200px){
-    .home div.posts-wrapper {
+@media (max-width: 1199px){
+    .home .posts-wrapper {
         width: 53vw;
     }
     article .post-picture-wrapper {
@@ -172,8 +172,8 @@ article .post-body .post-add-comment form button {
         max-height: 53vw;
     }
 }
-@media (max-width: 992px){
-    .home div.posts-wrapper {
+@media (max-width: 991px){
+    .home .posts-wrapper {
         width: 66vw;
     }
     article .post-picture-wrapper {
@@ -183,8 +183,8 @@ article .post-body .post-add-comment form button {
         max-height: 654px;
     }
 }
-@media (max-width: 547px){
-    .home div.posts-wrapper {
+@media (max-width: 575px){
+    .home .posts-wrapper {
         width: 100%;
     }
 }

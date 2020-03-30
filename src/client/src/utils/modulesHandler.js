@@ -1,0 +1,1 @@
+export default fn => ({dispatch, commit}, params) => Promise.resolve(fn({dispatch, commit}, params)).catch(err => { dispatch('errors/setErrors', err, { root: true }) });

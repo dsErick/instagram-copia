@@ -3,8 +3,8 @@
     <Navbar />
     <Errors />
 
-    <div class="post d-flex align-items-center justify-content-center">
-        <article v-if="getPosts._id">
+    <main class="post d-flex align-items-center justify-content-center">
+        <article v-if="getPosts._id === $route.params.id">
             <header class="d-flex align-items-center">
                 <router-link :to="`/${getPosts.user.username}`">
                     <img class="profile-picture" :src="`http://192.168.88.146:5000/media/profiles/${getPosts.user.profilePhoto}`" alt="Profile Picture">
@@ -53,7 +53,7 @@
                 </div>
             </div>
         </article>
-    </div>
+    </main>
 </div>
 </template>
 

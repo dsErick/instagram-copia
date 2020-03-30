@@ -26,9 +26,13 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/users/:id
 // @access  Public
 exports.getUser = asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.params.id).populate({ path: 'posts', populate: { path: 'comments', model: 'Comment' }});
+    const objId = (require('mongoose').Types.ObjectId.isValid(req.params.id)) ? req.params.id : '123456789012';
+    
+    const user = await User.findOne({
+        $or: [{ _id: objId }, { username: req.params.id }]
+    }).populate({ path: 'posts', options: { sort: '-createdAt' }/* , populate: { path: 'comments', model: 'Comment' } */});
 
-    if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário com id ${req.params.id}`, 404));
+    if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário ${req.params.id}`, 404));
     
     res.status(200).json({
         success: true,

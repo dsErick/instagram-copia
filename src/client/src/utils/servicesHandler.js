@@ -1,0 +1,1 @@
+export default fn => params => Promise.resolve(fn(params)).catch(err => { return err.response.data });

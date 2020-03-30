@@ -19,23 +19,25 @@ export default {
 <style>
 .alert {
     overflow: auto;
-    max-width: 45%;
+    text-align: center;
+    max-width: 55%;
     margin: auto;
 }
 
 @media (max-width: 1200px){
     .alert {
-        max-width: 53%;
+        max-width: 78%;
     }
 }
 @media (max-width: 992px){
     .alert {
-        max-width: 66%;
-    }
-}
-@media (max-width: 547px){
-    .alert {
+        text-align: left;
         max-width: 98%;
     }
 }
+/* @media (max-width: 547px){
+    .alert {
+        max-width: 98%;
+    }
+} */
 </style>

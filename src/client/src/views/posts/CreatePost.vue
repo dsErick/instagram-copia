@@ -3,7 +3,7 @@
     <Navbar />
     <Errors />
     
-    <div class="create-post d-flex align-items-center justify-content-center">
+    <main class="create-post d-flex align-items-center justify-content-center">
         <div class="form">
             <h3 class="text-center mb-4 h1">Criar novo post</h3>
             <form @submit.prevent="onSubmit" enctype="multipart/form-data">
@@ -28,7 +28,7 @@
                 <button class="btn btn-primary w-100 mt-4">Publicar</button>
             </form>
         </div>
-    </div>
+    </main>
 </div>
 </template>
 
@@ -73,17 +73,17 @@ export default {
     box-shadow: 0 0 16px rgba(190, 187, 187, 1);
 }
 
-@media (max-width: 1200px){
+@media (max-width: 1199px){
     .form {
         width: 66vw;
     }
 }
-@media (max-width: 992px){
+@media (max-width: 991px){
     .form {
         width: 78vw;
     }
 }
-@media (max-width: 547px){
+@media (max-width: 575px){
     .form {
         width: 100%;
     }
