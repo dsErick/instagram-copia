@@ -21,6 +21,15 @@ connectDB();
 
 const app = express();
 
+// Socket.io setup
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+app.use((req, res, next) => {
+    req.io = io;
+
+    next();
+});
+
 // Middlewares
 const limiter = rateLimit({
     windowMs: 5 * 60 * 1000,
@@ -51,10 +60,10 @@ app.use('/api/v1/users', require('./routes/users'));
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, console.log(`Server runinning at port ${PORT}`));
+server.listen(PORT, console.log(`Server runinning at port ${PORT}`));
 
 // Handle unhandled rejections
-process.on('unhandledRejection', (err, promise) => {
+process.on('unhandledRejection', (err) => {
     console.error(err.stack);
     server.close(() => process.exit(1));
 });

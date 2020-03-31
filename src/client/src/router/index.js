@@ -20,11 +20,11 @@ const router = new VueRouter({
             meta: {
                 requiresAuth: true
             },
-            component: () => import(/* webpackChunkName: Home */'@/views/Home')
+            component: () => import(/* webpackChunkName: 'Home' */'@/views/Home')
         },
         {
             path: '*',
-            component: () => import('@/views/404')
+            component: () => import(/* webpackChunkName: '404' */'@/views/404')
         }
     ]
 });

@@ -44,7 +44,6 @@ exports.getPost = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.addPost = asyncHandler(async (req, res, next) => {
     req.body.user = req.user.id;
-    // req.body.author = req.user.username;
 
     // Check for image
     if (!req.files && !req.files.image) return next(new ErrorResponse(`Informe uma imagem para a postagem`, 400));
@@ -53,7 +52,7 @@ exports.addPost = asyncHandler(async (req, res, next) => {
     if (!req.files.image.mimetype.startsWith('image')) return next(new ErrorResponse(`Informe uma imagem para a postagem`, 400));
     
     // Post image name
-    const imageName = `IMG_${new Date().toISOString().replace(/T/, '_').replace(/\..+/, '').replace(/[-:]/g, '')}_${Math.floor(Math.random() * 1000) + 1}.jpg`;
+    const imageName = `IMG_${new Date().toISOString().replace(/T/, '_').replace(/\..+/, '').replace(/[-:]/g, '')}.jpg`;
     
     req.body.image = imageName;
 
@@ -70,6 +69,8 @@ exports.addPost = asyncHandler(async (req, res, next) => {
         .jpeg({ quality: 90, chromaSubsampling: '4:4:4' })
         .toFile(`${process.env.POST_IMAGE_PATH}/${req.user.id}/${imageName}`);
 
+    req.io.emit('postCreated', post);
+        
     res.status(200).json({
         success: true,
         data: post
@@ -115,6 +116,8 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
     // Delete post
     await post.remove();
     
+    req.io.emit('postDeleted', post);
+
     res.status(200).json({
         success: true,
         data: {}

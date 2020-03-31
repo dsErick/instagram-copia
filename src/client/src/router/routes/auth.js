@@ -5,7 +5,7 @@ export default [
         meta: {
             title: 'Login | FakeInsta'
         },
-        component: () => import(/* webpackChunkName: Login */'@/views/auth/Login')
+        component: () => import(/* webpackChunkName: 'Login' */'@/views/auth/Login')
     },
     {
         path: '/register',
@@ -13,26 +13,26 @@ export default [
         meta: {
             title: 'Cadastro | FakeInsta'
         },
-        component: () => import(/* webpackChunkName: Register */'@/views/auth/Register')
+        component: () => import(/* webpackChunkName: 'Register' */'@/views/auth/Register')
     },
     {
         path: '/emailsent',
         name: 'EmailSent',
-        component: () => import(/* webpackChunkName: EmailSent */'@/views/auth/EmailSent')
+        component: () => import(/* webpackChunkName: 'EmailSent' */'@/views/auth/EmailSent')
     },
     {
         path: '/accountverification/:token',
         name: 'AccountVerification',
-        component: () => import(/* webpackChunkName: AccountVerification */'@/views/auth/AccountVerification')
+        component: () => import(/* webpackChunkName: 'AccountVerification' */'@/views/auth/AccountVerification')
     },
     {
         path: '/forgotpassword',
         name: 'ForgotPassword',
-        component: () => import(/* webpackChunkName: ForgotPassword */'@/views/auth/ForgotPassword')
+        component: () => import(/* webpackChunkName: 'ForgotPassword' */'@/views/auth/ForgotPassword')
     },
     {
         path: '/resetpassword/:token',
         name: 'ResetPassword',
-        component: () => import(/* webpackChunkName: ResetPassword */'@/views/auth/ResetPassword')
+        component: () => import(/* webpackChunkName: 'ResetPassword' */'@/views/auth/ResetPassword')
     }
 ];

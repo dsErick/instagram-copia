@@ -5,6 +5,6 @@ export default [
         meta: {
             requiresAuth: true
         },
-        component: () => import(/* webpackChunkNames: ShowUser */'@/views/users/ShowUser')
+        component: () => import(/* webpackChunkNames: 'ShowUser' */'@/views/users/ShowUser')
     }
 ]

@@ -1,5 +1,7 @@
 <template>
 <div class="home">
+    <div class="notification">Um novo post foi adicionado <i class="icon arrows-1_refresh-68"></i></div>
+
     <Navbar />
     <Errors />
     <main v-if="getPosts.length > 0" class="posts-wrapper">
@@ -82,10 +84,42 @@ export default {
         ...mapGetters(['getPosts']),
         ...mapGetters('auth', ['getUser'])
     },
+    sockets: {
+        postCreated() {
+            document.querySelector('.notification').classList.add('notifyAnimation');
+            setTimeout(() => document.querySelector('.notification').classList.remove('notifyAnimation'), 7000);
+        }
+    }
 }
 </script>
 
 <style scoped>
+.notification {
+    position: fixed;
+    top: 0; left: 10%;
+    z-index: 5;
+    width: 80%;
+
+    font-size: 1em;
+    font-weight: 700;
+    background: rgba(190, 187, 187, .9);
+    text-align: center;
+    padding: 8px;
+    border-radius: 5px;
+    
+    transform: translateY(-50px);
+    opacity: 0;
+    visibility: hidden;
+}
+.notifyAnimation { animation: notify 7s ease }
+@keyframes notify {
+    20%, 80% {
+        transform: translateY(30px);
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
 .home .posts-wrapper {
     width: 45vw;
     margin: auto;

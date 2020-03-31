@@ -5,7 +5,7 @@ export default [
         meta: {
             requiresAuth: true
         },
-        component: () => import(/* webpackChunkName: CreatePost */'@/views/posts/CreatePost')
+        component: () => import(/* webpackChunkName: 'CreatePost' */'@/views/posts/CreatePost')
     },
     {
         path: '/posts/:id',
@@ -13,6 +13,6 @@ export default [
         meta: {
             requiresAuth: true
         },
-        component: () => import(/* webpackChunkName: ShowPost */'@/views/posts/ShowPost')
+        component: () => import(/* webpackChunkName: 'ShowPost' */'@/views/posts/ShowPost')
     }
 ]
