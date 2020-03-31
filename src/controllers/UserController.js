@@ -12,7 +12,8 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
         $or: [
             { 'name': { $regex: query, $options: 'i'} },
             { 'username': { $regex: query, $options: 'i'} }
-        ]
+        ],
+        isVerified: true, role: 'user'
     });
 
     res.status(200).json({
@@ -29,8 +30,8 @@ exports.getUser = asyncHandler(async (req, res, next) => {
     const objId = (require('mongoose').Types.ObjectId.isValid(req.params.id)) ? req.params.id : '123456789012';
     
     const user = await User.findOne({
-        $or: [{ _id: objId }, { username: req.params.id }]
-    }).populate({ path: 'posts', options: { sort: '-createdAt' }/* , populate: { path: 'comments', model: 'Comment' } */});
+        $or: [{ _id: objId }, { username: req.params.id }], isVerified: true, role: 'user'
+    }).populate({ path: 'posts', options: { sort: '-createdAt' }});
 
     if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário ${req.params.id}`, 404));
     

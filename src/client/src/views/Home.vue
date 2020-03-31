@@ -6,7 +6,7 @@
         <article v-for="post in getPosts" :key="post._id" class="my-5">
             <header class="d-flex align-items-center">
                 <router-link :to="`/${post.user.username}`">
-                    <img class="profile-picture" :src="`http://192.168.88.146:5000/media/profiles/${post.user.profilePhoto}`" alt="Profile Picture">
+                    <img class="profile-picture" :src="`${$backendURL}/media/profiles/${post.user.profilePhoto}`" alt="Profile Picture">
                 </router-link>
                 <h4 class="w-100">
                     <router-link :to="`/${post.user.username}`" class="user-link">
@@ -20,7 +20,7 @@
 
             <div class="post-picture-wrapper">
                 <router-link :to="`/posts/${post._id}`">
-                    <img class="post-picture" :src="`http://192.168.88.146:5000/media/posts/${post.user._id}/${post.image}`" alt="Post">
+                    <img class="post-picture" :src="`${$backendURL}/media/posts/${post.user._id}/${post.image}`" alt="Post">
                 </router-link>
             </div>
 

@@ -2,11 +2,17 @@ export default [
     {
         path: '/login',
         name: 'Login',
+        meta: {
+            title: 'Login | FakeInsta'
+        },
         component: () => import(/* webpackChunkName: Login */'@/views/auth/Login')
     },
     {
         path: '/register',
         name: 'Register',
+        meta: {
+            title: 'Cadastro | FakeInsta'
+        },
         component: () => import(/* webpackChunkName: Register */'@/views/auth/Register')
     },
     {

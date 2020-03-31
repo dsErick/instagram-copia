@@ -2,34 +2,39 @@
 <div class="show-user">
     <Navbar />
     <Errors />
-    
-    <main v-if="getUser.username === $route.params.user || getUser._id === $route.params.user">
+
+    <main v-if="getSingleUser.username === $route.params.user || getSingleUser._id === $route.params.user">
         <header class="row">
             <div class="col-sm-4 profile-photo row d-flex align-items-center">
                 <div class="col-sm-12 col-5">
-                    <img :src="`http://192.168.88.146:5000/media/profiles/${getUser.profilePhoto}`" :alt="`${getUser.name} profile photo`">
+                    <img :src="`${$backendURL}/media/profiles/${getSingleUser.profilePhoto}`" :alt="`${getSingleUser.name} profile photo`">
                 </div>
                 <div class="d-sm-none col-7">
-                    <strong>{{ getUser.posts.length }}</strong> publicações
+                    <strong>{{ getSingleUser.posts.length }}</strong> publicações
                 </div>
             </div>
             <section class="col-sm-8 user-details">
                 <div>
-                    <h4>{{ getUser.username }} <router-link :to="`/${getUser.username}/edit`"></router-link></h4>
+                    <h4>
+                        {{ getSingleUser.username }}
+                        <router-link v-if="getSingleUser._id === getUser._id" :to="`/${getSingleUser.username}/edit`" class="btn btn-light">
+                            Editar perfil <i class="icon ui-1_settings-gear-63"></i>
+                        </router-link>
+                    </h4>
                 </div>
                 <div>
-                    <strong>{{ getUser.posts.length }}</strong> publicações
+                    <strong>{{ getSingleUser.posts.length }}</strong> publicações
                 </div>
                 <div>
-                    <h5>{{ getUser.name }}</h5>
-                    <p>{{ getUser.bio }}</p>
+                    <h5>{{ getSingleUser.name }}</h5>
+                    <p>{{ getSingleUser.bio }}</p>
                 </div>
             </section>
         </header>
         <div class="posts row">
-            <div class="col-4 post-image" v-for="post in getUser.posts" :key="post._id">
+            <div class="col-4 post-image" v-for="post in getSingleUser.posts" :key="post._id">
                 <router-link :to="`/posts/${post._id}`">
-                    <img :src="`http://192.168.88.146:5000/media/posts/${getUser._id}/${post.image}`" alt="Post">
+                    <img :src="`${$backendURL}/media/posts/${getSingleUser._id}/${post.image}`" alt="Post">
                 </router-link>
             </div>
         </div>
@@ -48,15 +53,15 @@ export default {
         Navbar, Errors
     },
     methods: {
-        ...mapActions('users', ['getSingleUser']),
-        imageUri(user, image) {
-            console.log(user, image);
-        }
+        ...mapActions('users', ['getUserByUsername'])
     },
     created() {
-        this.getSingleUser(this.$route.params.user);
+        this.getUserByUsername(this.$route.params.user);
     },
-    computed: mapGetters('users', ['getUser'])
+    computed: {
+        ...mapGetters('users', ['getSingleUser']),
+        ...mapGetters('auth', ['getUser'])
+    }
 }
 </script>
 

@@ -40,4 +40,10 @@ router.beforeEach(async (to, from, next) => {
     }
 })
 
+router.afterEach((to) => {
+    Vue.nextTick(() => {
+      document.title = to.meta.title ? to.meta.title : 'FakeInsta';
+    })
+});
+
 export default router;

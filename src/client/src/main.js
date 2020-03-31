@@ -11,6 +11,8 @@ Vue.config.productionTip = false
 
 Vue.use(require('vue-moment'))
 
+Vue.prototype.$backendURL = 'http://192.168.88.146:5000';
+
 new Vue({
   router,
   store,
