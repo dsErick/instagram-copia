@@ -5,7 +5,7 @@
     <Navbar />
     <Errors />
     <main v-if="getPosts.length > 0" class="posts-wrapper">
-        <article v-for="post in getPosts" :key="post._id" class="my-5">
+        <article v-for="post in getPosts" :key="post._id" class="mb-5">
             <header class="d-flex align-items-center">
                 <router-link :to="`/users/${post.user.username}`">
                     <img class="profile-picture" :src="`${$backendURL}/media/profiles/${post.user.profilePhoto}`" alt="Profile Picture">

@@ -72,6 +72,7 @@ export default {
 }
 
 main header {
+    margin: 0;
     padding-bottom: 32px;
     border-bottom: 1px solid rgba(190, 187, 187, 1);
 }
