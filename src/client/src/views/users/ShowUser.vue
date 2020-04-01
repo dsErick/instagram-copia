@@ -17,7 +17,7 @@
                 <div>
                     <h4>
                         {{ getSingleUser.username }}
-                        <router-link v-if="getSingleUser._id === getUser._id" :to="`/${getSingleUser.username}/edit`" class="btn btn-light">
+                        <router-link v-if="getSingleUser._id === getUser._id" to="/users/accounts/edit" class="btn btn-light">
                             Editar perfil <i class="icon ui-1_settings-gear-63"></i>
                         </router-link>
                     </h4>
@@ -27,7 +27,7 @@
                 </div>
                 <div>
                     <h5>{{ getSingleUser.name }}</h5>
-                    <p>{{ getSingleUser.bio }}</p>
+                    <p v-if="getSingleUser.bio" v-html="getSingleUser.bio.replace(/(?:\r\n|\r|\n)/g, '<br>')"></p>
                 </div>
             </section>
         </header>
@@ -89,10 +89,13 @@ main header > .user-details :nth-child(1) h4 {
     font-size: 2em;
     margin-bottom: 16px;
 }
-
 main header > .user-details :nth-child(2) {
     font-size: 1.1em;
     margin-bottom: 16px;
+}
+main header > .user-details :last-child h5 {
+    font-weight: 500;
+    margin-bottom: 0;
 }
 
 main .posts {

@@ -77,6 +77,15 @@ export const getAccessToken = servicesHandler(async () => {
     return data;
 });
 
+
+// @desc    Update user details
+// @access  Private
+export const updateDetails = servicesHandler(async userData => {
+    const { data } = await http.put(`/auth/updatedetails`, userData, { headers: { 'Content-Type': 'multipart/form-data' }});
+
+    return data;
+});
+
 // @desc    Send reset password email to user
 // @access  Public
 export const forgotPassword = servicesHandler(async email => {

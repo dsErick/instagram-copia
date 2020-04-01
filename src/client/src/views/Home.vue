@@ -7,11 +7,11 @@
     <main v-if="getPosts.length > 0" class="posts-wrapper">
         <article v-for="post in getPosts" :key="post._id" class="my-5">
             <header class="d-flex align-items-center">
-                <router-link :to="`/${post.user.username}`">
+                <router-link :to="`/users/${post.user.username}`">
                     <img class="profile-picture" :src="`${$backendURL}/media/profiles/${post.user.profilePhoto}`" alt="Profile Picture">
                 </router-link>
                 <h4 class="w-100">
-                    <router-link :to="`/${post.user.username}`" class="user-link">
+                    <router-link :to="`/users/${post.user.username}`" class="user-link">
                         <strong>{{ post.user.username }}</strong>
                     </router-link>
                     <br>
@@ -40,7 +40,7 @@
                 <router-link v-if="post.commentsCount > 1" class="text-muted" :to="`/posts/${post._id}`">Ver todos os {{ post.commentsCount }} comentários</router-link>
                 <div class="post-comments" v-for="comment in post.comments" :key="comment.id">
                     <span class="comment-body">
-                        <router-link :to="`/${comment.user.username}`" class="user-link">
+                        <router-link :to="`/users/${comment.user.username}`" class="user-link">
                             <strong>{{ comment.user.username }}</strong>
                         </router-link>
                         {{ comment.body }}

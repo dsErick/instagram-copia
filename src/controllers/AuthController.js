@@ -224,8 +224,9 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
     // Upload image to system files
     if (req.files && req.files.profilePhoto)
         await sharp(req.files.profilePhoto.data)
-            .resize(720)
-            .jpeg({ quality: 100, chromaSubsampling: '4:4:4' })
+            .rotate()
+            .resize(360, 360, { fit: 'contain' })
+            .jpeg({ quality: 90, chromaSubsampling: '4:4:4' })
             .toFile(`${process.env.PROFILE_PHOTO_PATH}/${user.profilePhoto}`);
 
     res.status(200).json({

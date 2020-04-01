@@ -6,11 +6,11 @@
     <main class="post d-flex align-items-center justify-content-center">
         <article v-if="getPosts._id === $route.params.id">
             <header class="d-flex align-items-center">
-                <router-link :to="`/${getPosts.user.username}`">
+                <router-link :to="`/users/${getPosts.user.username}`">
                     <img class="profile-picture" :src="`http://192.168.88.146:5000/media/profiles/${getPosts.user.profilePhoto}`" alt="Profile Picture">
                 </router-link>
                 <h4 class="w-100">
-                    <router-link :to="`/${getPosts.user.username}`" class="user-link">
+                    <router-link :to="`/users/${getPosts.user.username}`" class="user-link">
                         <strong>{{ getPosts.user.username }}</strong>
                     </router-link>
                     <br>
@@ -37,7 +37,7 @@
                 <span class="text-muted">{{ getPosts.commentsCount }} comentários</span>
                 <div class="post-comments" v-for="comment in getPosts.comments" :key="comment.id">
                     <span class="comment-body">
-                        <router-link :to="`/${comment.user.username}`" class="user-link">
+                        <router-link :to="`/users/${comment.user.username}`" class="user-link">
                             <strong>{{ comment.user.username }}</strong>
                         </router-link>
                         {{ comment.body }}

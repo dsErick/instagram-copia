@@ -14,7 +14,7 @@
             <div class="autocomplete-items"></div>
         </div>
 
-        <ul class="navbar-nav ml-auto h3">
+        <ul class="navbar-nav ml-auto h4">
             <li class="nav-item active">
                 <router-link to="/" class="nav-link"><i class="icon ui-1_home-minimal"></i></router-link>
             </li>
@@ -22,10 +22,10 @@
                 <router-link to="/posts/create" class="nav-link"><i class="icon ui-1_bold-add"></i></router-link>
             </li>
             <li class="nav-item">
-                <router-link :to="`/${getUser.username}`" class="nav-link"><i class="icon users_single-01"></i></router-link>
+                <router-link :to="`/users/${getUser.username}`" class="nav-link"><i class="icon users_single-01"></i></router-link>
             </li>
             <li class="nav-item">
-                <a @click.prevent="userLogout" class="nav-link" href="#">Sair</a>
+                <a @click.prevent="userLogout" class="nav-link" href="#"><i class="icon arrows-2_log-out"></i></a>
             </li>
         </ul>
     </div>
@@ -51,7 +51,7 @@ export default {
                     data.forEach(user => {
                         let div = document.createElement('a');
                         div.classList.add('autocomplete-link');
-                        div.setAttribute('href', `#/${user.username}`);
+                        div.setAttribute('href', `#/users/${user.username}`);
                         div.innerHTML = `
                         <div>
                             <img src="${this.$backendURL}/media/profiles/${user.profilePhoto}" alt="${user.name} profile photo">

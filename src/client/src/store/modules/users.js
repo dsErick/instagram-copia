@@ -11,14 +11,6 @@ const getters = {
 };
 
 const actions = {
-    getUserByUsername: modulesHandler(async ({commit}, user) => {
-        const data = await getUser(user);
-
-        // Check for error
-        if (!data.success) throw data.error;
-
-        commit('setUser', data.data);
-    }),
     searchForUser: modulesHandler(async ({commit}, query) => {
         const data = await getUsers(query);
 
@@ -27,6 +19,14 @@ const actions = {
         commit('errors/resetErrors', null, { root: true });
 
         return data.data;
+    }),
+    getUserByUsername: modulesHandler(async ({commit}, user) => {
+        const data = await getUser(user);
+
+        // Check for error
+        if (!data.success) throw data.error;
+
+        commit('setUser', data.data);
     })
 };
 

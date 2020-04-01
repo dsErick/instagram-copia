@@ -1,5 +1,5 @@
 import router from '@/router';
-import { register, accountVerification, resendToken, login, logout, getMe, getAccessToken, forgotPassword, resetPassword } from '@/services/AuthService';
+import { register, accountVerification, resendToken, login, logout, getMe, getAccessToken, updateDetails, forgotPassword, resetPassword } from '@/services/AuthService';
 
 import modulesHandler from '@/utils/modulesHandler';
 
@@ -111,6 +111,19 @@ const actions = {
         if (data.token) await dispatch('getLoggedInUser');
     }),
 
+    // @desc    Update logged in user details
+    updateUserDetails: modulesHandler(async ({commit}, userData) => {
+        const data = await updateDetails(userData);
+        
+        // Check for any error
+        if (!data.success) throw data.error;
+
+        commit('errors/resetErrors', null, { root: true });
+
+        router.push({ name: 'ShowUser', params: { user: data.data.username } });
+        router.go();
+    }),
+    
     // @desc    Send reset password email to user
     sendForgotPasswordEmail: modulesHandler(async ({commit}, email) => {
         const data = await forgotPassword(email);
