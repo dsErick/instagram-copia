@@ -24,7 +24,7 @@ const actions = {
 
     getSinglePost: modulesHandler(async ({commit}, post) => {
         const data = await getPost(post);
-        
+
         if (!data.success) throw data.error;
         
         commit('setPosts', data.data);
@@ -58,7 +58,6 @@ const actions = {
 
         // Recarrega os posts
         if (router.currentRoute.name === 'Home') dispatch('getAllPosts');
-        if (router.currentRoute.name === 'ShowPost') dispatch('getSinglePost', router.currentRoute.params.id);
     }),
 
     deletePostComment: modulesHandler(async ({dispatch}, params) => {
@@ -68,7 +67,6 @@ const actions = {
 
         // Recarrega os posts
         if (router.currentRoute.name === 'Home') dispatch('getAllPosts');
-        if (router.currentRoute.name === 'ShowPost') dispatch('getSinglePost', router.currentRoute.params.id);
     })
 };
 

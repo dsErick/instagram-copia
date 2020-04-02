@@ -1,6 +1,6 @@
 <template>
 <div class="home">
-    <div class="notification">Um novo post foi adicionado <i class="icon arrows-1_refresh-68"></i></div>
+    <div @click="$router.go()" class="notification" onselectstart="return false">Um novo post foi adicionado <i class="icon arrows-1_refresh-68"></i></div>
 
     <Navbar />
     <Errors />
@@ -17,7 +17,7 @@
                     <br>
                     {{ post.place }}
                 </h4>
-                <span v-if="getUser._id === post.user._id || getUser.role === 'admin'" @click="deletePost(post._id)" class="delete-post flex-shrink-1"><i class="icon ui-1_trash"></i></span>
+                <span v-if="getUser._id === post.user._id" @click="deletePost(post._id)" class="delete-post flex-shrink-1"><i class="icon ui-1_trash"></i></span>
             </header>
 
             <div class="post-picture-wrapper">
@@ -45,7 +45,7 @@
                         </router-link>
                         {{ comment.body }}
                     </span>
-                    <span v-if="getUser._id === comment.user.id || getUser.role === 'admin'" @click="deletePostComment({comment: comment._id, post: post._id})" class="comment-options"><i class="icon ui-1_trash"></i></span>
+                    <span v-if="getUser._id === comment.user.id" @click="deletePostComment({comment: comment._id, post: post._id})" class="comment-options"><i class="icon ui-1_trash"></i></span>
                 </div>
 
                 <div class="post-add-comment">
@@ -87,7 +87,7 @@ export default {
     sockets: {
         postCreated() {
             document.querySelector('.notification').classList.add('notifyAnimation');
-            setTimeout(() => document.querySelector('.notification').classList.remove('notifyAnimation'), 7000);
+            setTimeout(() => document.querySelector('.notification').classList.remove('notifyAnimation'), 5000);
         }
     }
 }
@@ -96,9 +96,8 @@ export default {
 <style scoped>
 .notification {
     position: fixed;
-    top: 0; left: 10%;
+    top: 0; left: calc(50% - 128px);
     z-index: 5;
-    width: 80%;
 
     font-size: 1em;
     font-weight: 700;
@@ -106,12 +105,13 @@ export default {
     text-align: center;
     padding: 8px;
     border-radius: 5px;
+    cursor: pointer;
     
     transform: translateY(-50px);
     opacity: 0;
     visibility: hidden;
 }
-.notifyAnimation { animation: notify 7s ease }
+.notifyAnimation { animation: notify 5s ease infinite }
 @keyframes notify {
     20%, 80% {
         transform: translateY(30px);

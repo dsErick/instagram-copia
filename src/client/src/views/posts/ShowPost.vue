@@ -3,7 +3,7 @@
     <Navbar />
     <Errors />
 
-    <main class="post d-flex align-items-center justify-content-center">
+    <main class="post d-flex align-items-center justify-content-center mb-5">
         <article v-if="getPosts._id === $route.params.id">
             <header class="d-flex align-items-center">
                 <router-link :to="`/users/${getPosts.user.username}`">
@@ -16,7 +16,7 @@
                     <br>
                     {{ getPosts.place }}
                 </h4>
-                <span v-if="getUser._id === getPosts.user._id || getUser.role === 'admin'" @click="deletePost(getPosts._id)" class="delete-post flex-shrink-1"><i class="icon ui-1_trash"></i></span>
+                <span v-if="getUser._id === getPosts.user._id" @click="deletePost(getPosts._id)" class="delete-post flex-shrink-1"><i class="icon ui-1_trash"></i></span>
             </header>
 
             <div class="post-picture-wrapper">
@@ -35,14 +35,14 @@
                 </div>
 
                 <span class="text-muted">{{ getPosts.commentsCount }} comentários</span>
-                <div class="post-comments" v-for="comment in getPosts.comments" :key="comment.id">
+                <div class="post-comments" v-for="comment in getPosts.comments" :key="comment._id">
                     <span class="comment-body">
                         <router-link :to="`/users/${comment.user.username}`" class="user-link">
                             <strong>{{ comment.user.username }}</strong>
                         </router-link>
                         {{ comment.body }}
                     </span>
-                    <span v-if="getUser._id === comment.user.id || getUser.role === 'admin'" @click="deletePostComment({comment: comment._id, post: getPosts._id})" class="comment-options"><i class="icon ui-1_trash"></i></span>
+                    <span v-if="getUser._id === comment.user._id" @click="deletePostComment({comment: comment._id, post: getPosts._id})" class="comment-options"><i class="icon ui-1_trash"></i></span>
                 </div>
 
                 <div class="post-add-comment">
@@ -81,6 +81,19 @@ export default {
         ...mapGetters(['getPosts']),
         ...mapGetters('auth', ['getUser'])
     },
+    sockets: {
+        commentCreated(data) {
+            if (data.comment.post === this.$route.params.id) {
+                data.comment.user = data.user;
+                this.getPosts.commentsCount++;
+                this.getPosts.comments.unshift(data.comment);
+            }
+        },
+        commentDeleted(comment) {
+            this.getPosts.commentsCount--;
+            this.getPosts.comments = this.getPosts.comments.filter(el => el._id !== comment._id);
+        }
+    }
 }
 </script>
 

@@ -3,6 +3,23 @@ const ErrorResponse = require('../utils/errors');
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 
+// @desc    Get all post comments 
+// @route   GET /api/v1/posts/:postId/comments
+// @access  Private
+exports.getPostComments = asyncHandler(async (req, res, next) => {
+    const post = await Post.findById(req.params.postId);
+    
+    // Check for post
+    if (!post) return next(new ErrorResponse(`Não foi encontrado nenhum post com id ${req.params.postId}`, 404));
+
+    const comments = await Comment.find({ post }).populate({ path: 'user', select: 'username' }).sort('-createdAt');
+
+    res.status(200).json({
+        success: true,
+        data: comments
+    });
+});
+
 // @desc    Create a comment for a post
 // @route   POST /api/v1/posts/:postId/comments
 // @access  Private
@@ -16,6 +33,8 @@ exports.addComment = asyncHandler(async (req, res, next) => {
     req.body.post = post._id;
 
     const comment = await Comment.create(req.body);
+
+    req.io.emit('commentCreated', { comment, user: { _id: req.user.id, username: req.user.username }});
 
     res.status(201).json({
         success: true,
@@ -70,6 +89,8 @@ exports.deleteComment = asyncHandler(async (req, res, next) => {
 
     await comment.remove();
 
+    req.io.emit('commentDeleted', comment);
+    
     res.status(200).json({
         success: true,
         data: {}
