@@ -121,7 +121,7 @@ export default {
 }
 
 .home .posts-wrapper {
-    width: 45vw;
+    width: 55vw;
     margin: auto;
 }
 article {
@@ -197,24 +197,24 @@ article .post-body .post-add-comment form button {
 
 @media (max-width: 1199px){
     .home .posts-wrapper {
-        width: 53vw;
+        width: 66vw;
     }
     article .post-picture-wrapper {
-        max-height: 53vw;
+        max-height: 66vw;
     }
     article .post-picture-wrapper .post-picture {
-        max-height: 53vw;
+        max-height: 66vw;
     }
 }
 @media (max-width: 991px){
     .home .posts-wrapper {
-        width: 66vw;
+        width: 84vw;
     }
     article .post-picture-wrapper {
-        max-height: 654px;
+        max-height: 574px;
     }
     article .post-picture-wrapper .post-picture {
-        max-height: 654px;
+        max-height: 574px;
     }
 }
 @media (max-width: 575px){

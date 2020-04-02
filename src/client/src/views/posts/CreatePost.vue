@@ -3,14 +3,17 @@
     <Navbar />
     <Errors />
     
-    <main class="create-post d-flex align-items-center justify-content-center">
+    <main class="create-post">
         <div class="form">
-            <h3 class="text-center mb-4 h1">Criar novo post</h3>
+            <h3 class="text-center mb-4 h1">Nova publicação</h3>
             <form @submit.prevent="onSubmit" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="image">Image</label>
-                    <input id="image" type="file" class="form-control-file" accept="image/*">
-                    <span class="invalid-feedback" role="alert"><strong>Informe uma imagem válida</strong></span>
+                <div id="image-preview-wrapper" class="form-group d-flex align-items-center justify-content-between">
+                    <div>
+                        <label for="image">Image</label>
+                        <input id="image" type="file" class="form-control-file" accept="image/*" @change="previewImage">
+                        <span class="invalid-feedback" role="alert"><strong>Informe uma imagem válida</strong></span>
+                    </div>
+                    <!-- <img id="img" src="#" alt="Preview" id="image-preview"> -->
                 </div>
                 <!-- <label>Imagem</label>
                 <div class="custom-file">
@@ -36,6 +39,7 @@
 import Errors from '@/components/partials/Errors';
 import Navbar from '@/components/layout/Navbar';
 import { mapActions } from 'vuex';
+import loadImage from 'blueimp-load-image';
 
 export default {
     name: 'CreatePost',
@@ -56,23 +60,46 @@ export default {
             post.set('place', document.getElementById('place').value);
 
             this.createPost(post);
+        },
+        previewImage(e) {
+            let rotation = {
+                1: 'rotate(0deg)', 3: 'rotate(180deg)',
+                6: 'rotate(90deg)', 8: 'rotate(270deg)'
+            };
+            if (e.target.files[0] && e.target.files[0].type.startsWith('image')) {
+                loadImage(e.target.files[0], (img, data) => {
+                    if (data.exif) img.setAttribute('style', `transform: ${rotation[data.exif.get('Orientation')]}`);
+                    img.setAttribute('id', 'image-preview');
+
+                    if (document.querySelector('#image-preview')) document.querySelector('#image-preview').remove();
+
+                    document.querySelector('#image-preview-wrapper').appendChild(img);
+
+                    // console.log(img, data, data.exif.get('Orientation'));
+                }, { maxWidth: 150, maxHeight: 150, meta: true });
+
+                
+                // let reader = new FileReader();
+                // reader.onload = e => {
+                //     console.log(e.target);
+                //     // document.querySelector('.image-preview').setAttribute('src', e.target.result);
+                // }
+                
+                // reader.readAsDataURL(e.target.files[0]);
+            }
         }
     }
 }
 </script>
 
 <style scoped>
-.create-post {
-    width: 100%;
-    min-height: calc(100vh - 80px);
-}
 .form {
+    margin: 48px auto;
     width: 55vw;
     padding: 24px;
     border-radius: 5px;
     box-shadow: 0 0 16px rgba(190, 187, 187, 1);
 }
-
 @media (max-width: 1199px){
     .form {
         width: 66vw;

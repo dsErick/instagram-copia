@@ -10,6 +10,9 @@
                     <img :src="`${$backendURL}/media/profiles/${getSingleUser.profilePhoto}`" :alt="`${getSingleUser.name} profile photo`">
                 </div>
                 <div class="d-sm-none col-7">
+                    <router-link v-if="getSingleUser._id === getUser._id" to="/users/accounts/edit" class="btn btn-light mb-2 w-100">
+                        Editar perfil <i class="icon ui-1_settings-gear-63"></i>
+                    </router-link>
                     <strong>{{ getSingleUser.posts.length }}</strong> publicações
                 </div>
             </div>
@@ -86,17 +89,20 @@ main header > .profile-photo img {
     border-radius: 50%;
 }
 
-main header > .user-details :nth-child(1) h4 {
+main header > .user-details > :nth-child(1) h4 {
     font-size: 2em;
     margin-bottom: 16px;
 }
-main header > .user-details :nth-child(2) {
+main header > .user-details > :nth-child(2) {
     font-size: 1.1em;
     margin-bottom: 16px;
 }
-main header > .user-details :last-child h5 {
+main header > .user-details > :last-child h5 {
     font-weight: 500;
     margin-bottom: 0;
+}
+main header > .user-details > :last-child p {
+    overflow-wrap: break-word;
 }
 
 main .posts {
@@ -122,16 +128,17 @@ main .posts .post-image img {
 @media (max-width: 575px) {
     main header {
         margin: 0 8px;
+        padding-bottom: 4px;
     }
     main header .profile-photo img {
-        max-width: 120px;
-        max-height: 120px;
+        max-width: 102px;
+        max-height: 102px;
     }
-    main header .user-details :nth-child(1) h4,
-    main header .user-details :nth-child(2) {
+    main header .user-details > :nth-child(1) h4,
+    main header .user-details > :nth-child(2) {
         display: none;
     }
-    main header .user-details :nth-child(3) {
+    main header .user-details > :nth-child(3) {
         margin-top: 16px;
     }
     main .posts {
