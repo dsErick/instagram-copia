@@ -3,7 +3,7 @@
     <Navbar />
     <Errors />
     <main>
-        <div class="row d-flex align-items-center justify-content-center">
+        <div class="row align-items-center justify-content-center">
             <div class="col-md-3">
                 <img :src="`${$backendURL}/media/profiles/${getUser.profilePhoto}`" :alt="`${getUser.name} profile photo`">
             </div>
@@ -12,11 +12,12 @@
             </div>
         </div>
         <form @submit.prevent="onSubmit" class="mt-3">
-            <div class="form-group row">
-                <label for="profilePhoto" class="col-md-3 col-form-label-sm">Foto do perfil</label>
-                <div class="col-md-8">
-                    <input id="profilePhoto" class="form-control-file" type="file" accept="image/*">
+            <div class="form-group row align-items-center">
+                <label for="profilePhoto" class="col-md-3 col-form-label-md">Foto do perfil</label>
+                <div class="col-md-6 col-7">
+                    <input id="profilePhoto" class="form-control-file" type="file" accept="image/*" @change="previewImage">
                 </div>
+                <div id="image-preview-wrapper" class="col-md-3 col-5 text-center"></div>
             </div>
             <div class="form-group row">
                 <label for="name" class="col-md-3 col-form-label-sm">Nome</label>
@@ -68,6 +69,7 @@
 import Navbar from '@/components/layout/Navbar';
 import Errors from '@/components/partials/Errors';
 import { mapActions, mapGetters } from 'vuex';
+import loadImage from 'blueimp-load-image';
 
 export default {
     name: 'EditUser',
@@ -111,6 +113,21 @@ export default {
             formData.set('gender', gender.value);
 
             this.updateUserDetails(formData);
+        },
+        previewImage(e) {
+            let rotation = {
+                1: 'rotate(0deg)', 3: 'rotate(180deg)',
+                6: 'rotate(90deg)', 8: 'rotate(270deg)'
+            };
+            if (e.target.files[0] && e.target.files[0].type.startsWith('image')) {
+                loadImage(e.target.files[0], (img, data) => {
+                    if (data.exif) img.setAttribute('style', `transform: ${rotation[data.exif.get('Orientation')]}`);
+                    img.setAttribute('id', 'image-preview');
+
+                    if (document.querySelector('#image-preview')) document.querySelector('#image-preview').remove();
+                    document.querySelector('#image-preview-wrapper').appendChild(img);
+                }, { maxWidth: 120, maxHeight: 120, meta: true });   
+            }
         }
     }
 }
@@ -119,7 +136,7 @@ export default {
 <style scoped>
 .edit-user > main {
     width: 58vw;
-    margin: 48px auto;
+    margin: auto;
     padding: 24px;
     border-radius: 5px;
     box-shadow: 0 0 16px rgba(190, 187, 187, 1);

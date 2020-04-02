@@ -8,17 +8,17 @@
         <form @submit.prevent="onSubmit">
             <div class="form-group">
                 <label for="name">Nome <span class="text-danger">*</span></label>
-                <input id="name" type="text" name="name" class="form-control" placeholder="Informe seu nome" v-model="user.name">
+                <input id="name" type="text" name="name" class="form-control" v-model="user.name">
                 <span class="invalid-feedback" role="alert"></span>
             </div>
             <div class="form-group">
                 <label for="username">Nome de usuário <span class="text-danger">*</span></label>
-                <input id="username" type="text" name="username" class="form-control" placeholder="Informe seu nome de usuário" v-model="user.username">
+                <input id="username" type="text" name="username" class="form-control" v-model="user.username">
                 <span class="invalid-feedback" role="alert"></span>
             </div>
             <div class="form-group">
                 <label for="email">Email <span class="text-danger">*</span></label>
-                <input id="email" type="text" name="email" class="form-control" placeholder="seuemail@gmail.com" v-model="user.email">
+                <input id="email" type="text" name="email" class="form-control" v-model="user.email">
                 <span class="invalid-feedback" role="alert"></span>
             </div>
             <div class="form-group">

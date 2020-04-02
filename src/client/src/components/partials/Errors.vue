@@ -20,24 +20,7 @@ export default {
 .alert {
     overflow: auto;
     text-align: center;
-    max-width: 55%;
-    margin: auto;
+    max-width: 98%;
+    margin: 4px auto;
 }
-
-@media (max-width: 1200px){
-    .alert {
-        max-width: 78%;
-    }
-}
-@media (max-width: 992px){
-    .alert {
-        text-align: left;
-        max-width: 98%;
-    }
-}
-/* @media (max-width: 547px){
-    .alert {
-        max-width: 98%;
-    }
-} */
 </style>

@@ -8,13 +8,18 @@
         <div id="success" class="alert alert-success d-none fade show" role="alert"></div>
 
         <form @submit.prevent="onSubmit">
-            <div class="form-group text-left mt-4">
+            <div class="form-group text-left mt-4 mb-1">
                 <label for="email">Informe seu email</label>
-                <input id="email" class="form-control" type="text" placeholder="seuemail@gmail.com" v-model="email">
+                <input id="email" class="form-control" type="text">
                 <span class="invalid-feedback" role="alert"><strong>Informe um email válido</strong></span>
             </div>
 
-            <button class="btn btn-primary w-100 mt-4" type="submit">Cadastrar</button>
+            <button class="btn btn-primary w-100 mt-4" type="submit">Enviar</button>
+            
+            <p class="text-center mt-4 mb-0">
+                Já possui uma conta?
+                <router-link to="/login" class="card-link">Conectar-se</router-link>
+            </p>
         </form>
     </div>
 </div>
@@ -29,23 +34,18 @@ export default {
     components: {
         Errors
     },
-    data() {
-        return {
-            email: ''
-        }
-    },
     methods: {
         ...mapActions('auth', ['sendForgotPasswordEmail']),
         async onSubmit() {
             let input = document.getElementById('email');
-            if (!this.email.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) input.classList.add('is-invalid');
+            if (!input.value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) input.classList.add('is-invalid');
             else {
                 input.classList.remove('is-invalid');
 
-                const email = await this.sendForgotPasswordEmail(this.email)
+                const email = await this.sendForgotPasswordEmail(input.value);
                 if (email) {
                     document.getElementById('success').classList.remove('d-none');
-                    document.getElementById('success').innerHTML = `Email enviado com sucesso para<br><strong>${email}</strong>`;
+                    document.getElementById('success').innerHTML = `Email enviado com sucesso para<br><strong class="text-center">${email}</strong>`;
                 }
                 else document.getElementById('success').classList.add('d-none');
             }
@@ -63,9 +63,14 @@ export default {
 }
 .forgot-password > div {
     background: #FAFAFA;
-    min-width: 33%;
+    min-width: 55%;
     padding: 48px 24px;
     border: 2px solid #bebcbc;
     border-radius: 5px;
+}
+@media (min-width: 1199px) {
+    .forgot-password > div {
+        min-width: 33%;
+    }
 }
 </style>

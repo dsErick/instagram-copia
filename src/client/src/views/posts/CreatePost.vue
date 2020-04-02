@@ -12,14 +12,14 @@
                         <label for="image">Image</label>
                         <input id="image" type="file" class="form-control-file" accept="image/*" @change="previewImage">
                         <span class="invalid-feedback" role="alert"><strong>Informe uma imagem válida</strong></span>
+                        <!-- <label>Imagem</label>
+                        <div class="custom-file">
+                            <label for="image" class="custom-file-label">Escolher imagem</label>
+                            <input id="image" type="file" class="custom-file-input" accept="image/*" @change="previewImage" >
+                        </div>
+                        <span class="invalid-feedback" role="alert"><strong>Informe uma imagem válida</strong></span> -->
                     </div>
-                    <!-- <img id="img" src="#" alt="Preview" id="image-preview"> -->
                 </div>
-                <!-- <label>Imagem</label>
-                <div class="custom-file">
-                    <label for="image" class="custom-file-label">Escolher imagem</label>
-                    <input id="image" type="file" class="custom-file-input" accept="image/*" >
-                </div> -->
                 <div class="form-group mt-3">
                     <label for="description">Descrição</label>
                     <input id="description" type="text" class="form-control" placeholder="Informe a descrição">
@@ -72,20 +72,8 @@ export default {
                     img.setAttribute('id', 'image-preview');
 
                     if (document.querySelector('#image-preview')) document.querySelector('#image-preview').remove();
-
                     document.querySelector('#image-preview-wrapper').appendChild(img);
-
-                    // console.log(img, data, data.exif.get('Orientation'));
-                }, { maxWidth: 150, maxHeight: 150, meta: true });
-
-                
-                // let reader = new FileReader();
-                // reader.onload = e => {
-                //     console.log(e.target);
-                //     // document.querySelector('.image-preview').setAttribute('src', e.target.result);
-                // }
-                
-                // reader.readAsDataURL(e.target.files[0]);
+                }, { maxWidth: 150, maxHeight: 150, meta: true });   
             }
         }
     }

@@ -8,11 +8,13 @@
         <form @submit.prevent="onSubmit">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input id="email" type="email" name="email" class="form-control" placeholder="seuemail@gmail.com" v-model="user.email">
+                <input id="email" type="text" name="email" class="form-control">
+                <span class="invalid-feedback" role="alert"><strong>Informe um e-mail válido</strong></span>
             </div>
             <div class="form-group mb-1">
                 <label for="password">Senha</label>
-                <input id="password" type="password" name="password" class="form-control" placeholder="Informe sua senha" required minlength="8" v-model="user.password" autocomplete>
+                <input id="password" type="password" name="password" class="form-control" autocomplete>
+                <span class="invalid-feedback" role="alert"><strong>A senha precisa ter pelo menos 8 caracteres</strong></span>
             </div>
             <p class="text-right my-0">
                 <router-link to="/forgotpassword" class="card-link">Esqueceu a senha</router-link>
@@ -37,18 +39,25 @@ export default {
     components: {
         Errors
     },
-    data() {
-        return {
-            user: {
-                email: '',
-                password: '',
-            }
-        }
-    },
     methods: {
         ...mapActions('auth', ['userLogin']),
-        onSubmit() {
-            this.userLogin(this.user);
+        onSubmit(e) {
+            const { email, password } = e.target.elements;
+            let isValid = true;
+
+            if (!email.value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+                email.classList.add('is-invalid');
+                isValid = false;
+            } else email.classList.remove('is-invalid');
+
+            if (password.value.length < 8) {
+                password.classList.add('is-invalid');
+                isValid = false;
+            } else password.classList.remove('is-invalid');
+
+            if (!isValid) return isValid;
+            
+            this.userLogin({ email: email.value, password: password.value });
         }
     }
 }
@@ -63,9 +72,14 @@ export default {
 }
 .login-card {
     background: #FAFAFA;
-    min-width: 33%;
+    min-width: 55%;
     padding: 48px 24px;
     border: 2px solid #bebcbc;
     border-radius: 5px;
+}
+@media (min-width: 1199px) {
+    .login-card {
+        min-width: 33%;
+    }
 }
 </style>

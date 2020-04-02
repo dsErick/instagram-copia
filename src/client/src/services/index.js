@@ -9,7 +9,7 @@ const http = axios.create({
 http.interceptors.response.use(res => { return res }, async err => {
     let originalRequest = err.config;
 
-    if (err.response.status === 401 && !originalRequest._retry) {
+    if (err.response.status === 401 && !originalRequest._retry && err.response.data.error === "Para acessar esta rota é necessário fazer login.") {
         originalRequest._retry = true;
 
         const { data } = await http.post('/auth/refresh', null, { _retry: true });

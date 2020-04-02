@@ -8,7 +8,7 @@
         <div id="success" class="alert alert-success d-none fade show" role="alert"><strong>Email re-enviado com sucesso</strong></div>
         
         <p class="my-4">
-            Email de confirmação enviado com sucesso para {{ email }}<br>
+            Email de confirmação enviado com sucesso para <strong>{{ email }}</strong><br>
             O email irá se expirar em 30 minutos<br>
             Caso não o tenha recebido, clique no botão abaixo
         </p>

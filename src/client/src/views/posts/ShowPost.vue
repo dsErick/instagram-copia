@@ -87,7 +87,7 @@ export default {
 <style scoped>
 .post {
     width: 45vw;
-    margin: 48px auto;
+    margin: auto;
 }
 .user-link {
     text-decoration: none;

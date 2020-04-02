@@ -27,7 +27,7 @@ exports.getPosts = asyncHandler(async (req, res, next) => {
 exports.getPost = asyncHandler(async (req, res, next) => {
     const post = await Post.findById(req.params.id).populate([
         'commentsCount',
-        { path: 'comments', populate: { path: 'user', select: 'username' }, sort: "-createdAt" },
+        { path: 'comments', populate: { path: 'user', select: 'username' }, options: { sort: "-createdAt" }},
         { path: 'user', select: 'username profilePhoto' }
     ]);
 

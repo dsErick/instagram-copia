@@ -191,6 +191,9 @@ button.nav-link {
     padding-top: 0;
 }
 @media (max-width: 575px) {
+    body {
+        margin-bottom: 48px;
+    }
     nav#webNav {
         display: none !important;
     }
