@@ -3,21 +3,23 @@
     <Navbar />
     <Errors />
     <main>
-        <div class="row align-items-center justify-content-center">
-            <div class="col-md-3">
+        <div class="row align-items-center">
+            <div class="col-md-3 col-auto">
                 <img :src="`${$backendURL}/media/profiles/${getUser.profilePhoto}`" :alt="`${getUser.name} profile photo`">
             </div>
-            <div class="col-md-8">
-                <span>{{getUser.username}}</span>
+            <div class="col-md-8 col">
+                <span>{{getUser.username}}</span><br>
+                <router-link to="/users/accounts/password" class="mr-2">Alterar senha</router-link>
+                <router-link to="/users/accounts/email">Alterar email</router-link>
             </div>
         </div>
         <form @submit.prevent="onSubmit" class="mt-3">
             <div class="form-group row align-items-center">
                 <label for="profilePhoto" class="col-md-3 col-form-label-md">Foto do perfil</label>
-                <div class="col-md-6 col-7">
+                <div class="col-md-6 col">
                     <input id="profilePhoto" class="form-control-file" type="file" accept="image/*" @change="previewImage">
                 </div>
-                <div id="image-preview-wrapper" class="col-md-3 col-5 text-center"></div>
+                <div id="image-preview-wrapper" class="col-auto text-center"></div>
             </div>
             <div class="form-group row">
                 <label for="name" class="col-md-3 col-form-label-sm">Nome</label>
@@ -177,14 +179,9 @@ main > form > div > label {
     
     main > div :first-child {
         text-align: center;
-        margin-bottom: 16px;
-    }
-    main > div img {
-        max-width: 96px;
-        max-height: 96px;
     }
     main > div > :last-child {
-        display: none;
+        padding-left: 0;
     }
 
     main > form > div > label {

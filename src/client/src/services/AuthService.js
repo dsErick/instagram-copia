@@ -86,6 +86,17 @@ export const updateDetails = servicesHandler(async userData => {
     return data;
 });
 
+// @desc    Update user password
+// @access  Private
+export const updatePassword = servicesHandler(async passwords => {
+    const { data } = await http.put(`/auth/updatepassword`, passwords);
+
+    // Set Authorization header
+    http.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+    
+    return data;
+});
+
 // @desc    Send reset password email to user
 // @access  Public
 export const forgotPassword = servicesHandler(async email => {

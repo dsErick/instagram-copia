@@ -28,13 +28,10 @@
                 <div class="post-description mb-3">
                     <strong>{{ getPosts.user.username }}</strong>
                     {{ getPosts.description }}<br>
-                    <!-- <div class="d-inline" v-for="hashtag in getPosts.hashtags" :key="hashtag">
-                        #{{ hashtag }}
-                    </div> -->
                     <strong class="d-block">{{ getPosts.createdAt | moment("from") }}</strong>
                 </div>
 
-                <span class="text-muted">{{ getPosts.commentsCount }} comentários</span>
+                <span v-if="getPosts.commentsCount > 1" class="text-muted">{{ getPosts.commentsCount }} comentários</span>
                 <div class="post-comments" v-for="comment in getPosts.comments" :key="comment._id">
                     <span class="comment-body">
                         <router-link :to="`/users/${comment.user.username}`" class="user-link">

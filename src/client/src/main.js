@@ -5,6 +5,8 @@ import router from './router'
 import store from './store'
 import http from './services'
 
+import 'nprogress/nprogress.css'
+
 // set auth header
 http.defaults.headers.common['Authorization'] = `Bearer ${store.state.auth.token}`
 

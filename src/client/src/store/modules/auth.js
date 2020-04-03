@@ -1,5 +1,5 @@
 import router from '@/router';
-import { register, accountVerification, resendToken, login, logout, getMe, getAccessToken, updateDetails, forgotPassword, resetPassword } from '@/services/AuthService';
+import { register, accountVerification, resendToken, login, logout, getMe, getAccessToken, updateDetails, updatePassword, forgotPassword, resetPassword } from '@/services/AuthService';
 
 import modulesHandler from '@/utils/modulesHandler';
 
@@ -122,6 +122,21 @@ const actions = {
 
         router.push({ name: 'ShowUser', params: { user: data.data.username } });
         router.go();
+    }),
+
+    // @desc    Update logged in user password
+    updateUserPassword: modulesHandler(async ({dispatch, commit}, passwords) => {
+        const data = await updatePassword(passwords);
+
+        // Check for errors
+        if (!data.success) throw data.error;
+
+        // Set token
+        commit('setToken', data.token);
+
+        await dispatch('getLoggedInUser');
+        
+        router.push({ name: 'Home' });
     }),
     
     // @desc    Send reset password email to user

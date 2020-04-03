@@ -16,10 +16,10 @@
                 <input id="password" type="password" name="password" class="form-control" autocomplete>
                 <span class="invalid-feedback" role="alert"><strong>A senha precisa ter pelo menos 8 caracteres</strong></span>
             </div>
-            <p class="text-right my-0">
+            <p class="text-right">
                 <router-link to="/forgotpassword" class="card-link">Esqueceu a senha</router-link>
             </p>
-            <button class="btn btn-primary w-100 mt-3" type="submit">Entrar</button>
+            <button class="btn btn-primary w-100" type="submit">Entrar</button>
         </form>
 
         <p class="text-center mt-4 mb-0">

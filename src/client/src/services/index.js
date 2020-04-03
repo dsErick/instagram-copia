@@ -1,4 +1,5 @@
 import axios from 'axios';
+import NProgress from 'nprogress';
 import store from '@/store';
 
 const http = axios.create({
@@ -6,7 +7,9 @@ const http = axios.create({
     withCredentials: true
 });
 
-http.interceptors.response.use(res => { return res }, async err => {
+http.interceptors.request.use(req => { NProgress.start(); return req });
+
+http.interceptors.response.use(res => { NProgress.done(); return res }, async err => {
     let originalRequest = err.config;
 
     if (err.response.status === 401 && !originalRequest._retry && err.response.data.error === "Para acessar esta rota é necessário fazer login.") {
@@ -18,7 +21,8 @@ http.interceptors.response.use(res => { return res }, async err => {
         
         return await axios(originalRequest);
     }
-
+    
+    NProgress.done();
     return Promise.reject(err);
 });
 
