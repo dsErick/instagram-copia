@@ -32,4 +32,11 @@ PostSchema.virtual('commentsCount', {
     count: true
 })
 
+// Cascade delete comments when a post is deleted
+PostSchema.pre('remove', async function(next) {
+    await this.model('Comment').deleteMany({ post: this._id });
+
+    next();
+});
+
 module.exports = mongoose.model('Post', PostSchema);

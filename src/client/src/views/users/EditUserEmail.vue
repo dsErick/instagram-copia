@@ -15,23 +15,24 @@
         </div>
         <form @submit.prevent="onSubmit" class="mt-3">
             <div class="form-group row">
-                <label for="name" class="col-md-3 col-form-label-sm">Nome</label>
+                <label for="email" class="col-md-3 col-form-label-sm">Email atual</label>
                 <div class="col-md-8">
-                    <input id="name" class="form-control" type="text" :value="getUser.name">
-                    <span class="invalid-feedback" role="alert"><strong>Informe um nome</strong></span>
+                    <input id="email" class="form-control" type="text">
+                    <span class="invalid-feedback" role="alert"><strong>Informe um email válido</strong></span>
                 </div>
             </div>
             <div class="form-group row">
-                <label for="username" class="col-md-3 col-form-label-sm">Nome de usuário</label>
+                <label for="newEmail" class="col-md-3 col-form-label-sm">Email novo</label>
                 <div class="col-md-8">
-                    <input id="username" class="form-control" type="text" :value="getUser.username">
-                    <span class="invalid-feedback" role="alert"><strong>Informe um nome de usuário válido</strong></span>
+                    <input id="newEmail" class="form-control" type="text">
+                    <span class="invalid-feedback" role="alert"><strong>Informe um email válido</strong></span>
                 </div>
             </div>
             <div class="form-group row">
-                <label for="bio" class="col-md-3 col-form-label-sm">Biografia</label>
+                <label for="confirmEmail" class="col-md-3 col-form-label-sm">Confirme o email</label>
                 <div class="col-md-8">
-                    <textarea id="bio" class="form-control" rows="2" v-model="getUser.bio"></textarea>
+                    <input id="confirmEmail" class="form-control" type="text">
+                    <span class="invalid-feedback" role="alert"><strong>Informe um email válido</strong></span>
                 </div>
             </div>
             <div class="col-md-5 col-8 mx-auto">
@@ -45,7 +46,7 @@
 <script>
 import Navbar from '@/components/layout/Navbar';
 import Errors from '@/components/partials/Errors';
-import { mapActions, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 
 export default {
     name: 'EditUser',
@@ -54,31 +55,28 @@ export default {
     },
     computed: mapGetters('auth', ['getUser']),
     methods: {
-        ...mapActions('auth', ['updateUserDetails']),
         onSubmit(e) {
-            console.log(e)
-            // const { profilePhoto, name, username, bio, phoneNumber, gender } = e.target.elements;
-            // let isValid = true;
+            const { email, newEmail, confirmEmail  } = e.target.elements;
+            let isValid = true;
 
-            // if (!name.value) {
-            //     name.classList.add('is-invalid');
-            //     isValid = false;
-            // } else name.classList.remove('is-invalid');
+            if (!email.value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+                email.classList.add('is-invalid');
+                isValid = false;
+            } else email.classList.remove('is-invalid');
 
-            // if (!username.value.match(/^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/im)) {
-            //     username.classList.add('is-invalid');
-            //     isValid = false;
-            // } else username.classList.remove('is-invalid');
-            
-            // if (phoneNumber.value && !phoneNumber.value.match(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im)) {
-            //     phoneNumber.classList.add('is-invalid');
-            //     isValid = false;
-            // } else phoneNumber.classList.remove('is-invalid');
+            if (!newEmail.value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)) {
+                newEmail.classList.add('is-invalid');
+                isValid = false;
+            } else newEmail.classList.remove('is-invalid');
 
-            // if (!isValid) return isValid;
+            if (confirmEmail.value !== newEmail.value) {
+                confirmEmail.classList.add('is-invalid');
+                isValid = false;
+            } else confirmEmail.classList.remove('is-invalid');
 
-            // this.updateUserDetails(formData);
-        },
+
+            if (!isValid) return isValid;
+        }
     }
 }
 </script>

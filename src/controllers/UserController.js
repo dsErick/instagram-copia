@@ -85,3 +85,56 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
         data: {}
     })
 });
+
+// @desc    Follow a user
+// @route   PUT /api/v1/users/:id/follow
+// @access  Private
+exports.followUser = asyncHandler(async (req, res, next) => {
+    const loggedUser = await User.findById(req.user._id);
+    const followedUser = await User.findById(req.params.id);
+
+    // Check for followed user exists
+    if (!followedUser) return next(new ErrorResponse(`Não foi encontrado nenhum usuário com id ${req.params.id}`, 404));
+    
+    // Make sure user does not follow itself
+    if (loggedUser._id.toString() === followedUser._id.toString()) return next(new ErrorResponse(`Não é possível seguir seu próprio perfil.`, 401));
+
+    // Make sure user is not already beeing followed
+    if (loggedUser.following.indexOf(followedUser._id) !== -1) return next(new ErrorResponse(`O usuário ${req.params.id} já está sendo seguido`, 401));
+
+    loggedUser.following.push(followedUser);
+    followedUser.followers.push(loggedUser);
+
+    await loggedUser.save();
+    await followedUser.save();
+    
+    res.status(200).json({
+        success: true,
+        data: `Usuário ${req.params.id} seguido`
+    });
+});
+
+// @desc    Unfollow a user
+// @route   DELETE /api/v1/users/unfollow
+// @access  Private
+exports.unfollowUser = asyncHandler(async (req, res, next) => {
+    const followeeUser = await User.findById(req.body.followeeUser);
+    const followerUser = await User.findById(req.body.followerUser);
+
+    if (!followerUser) return next(new ErrorResponse(`Não foi encontrado nenhum usuário com id ${req.body.followerUser}`, 404));
+
+    // Make sure user is beeing followed
+    const userIndex = followeeUser.followers.indexOf(followerUser._id);
+    if (userIndex === -1) return next(new ErrorResponse(`O usuário ${req.body.followerUser} não segue ${req.body.followeeUser}`, 404));
+
+    followeeUser.followers.splice(userIndex, 1);
+    followerUser.following.splice(followerUser.following.indexOf(followeeUser._id), 1);
+
+    await followeeUser.save();
+    await followerUser.save();
+    
+    res.status(200).json({
+        success: true,
+        data: `O usuário ${followerUser._id} deixou de seguir ${followeeUser._id}`
+    });
+});
