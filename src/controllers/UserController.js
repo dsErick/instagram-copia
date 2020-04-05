@@ -108,6 +108,10 @@ exports.followUser = asyncHandler(async (req, res, next) => {
     await loggedUser.save();
     await followedUser.save();
     
+    Object.values(req.currentConnections).forEach(conn => {
+        if (conn.userId === req.params.id) req.io.to(conn.socketId).emit('newFollower', loggedUser.username);
+    });
+
     res.status(200).json({
         success: true,
         data: `Usuário ${req.params.id} seguido`

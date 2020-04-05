@@ -82,6 +82,8 @@ const actions = {
             commit('reset');
 
             router.push({ name: 'Login' });
+            
+            router.app.$socket.emit('userLogOut');
         } catch (err) {
             router.push({ name: 'Login' });
             dispatch('errors/setErrors', err, { root: true });
@@ -100,6 +102,8 @@ const actions = {
         
         // Reset Errors
         commit('errors/resetErrors', null, { root: true });
+
+        router.app.$socket.emit('userLogIn', data.data._id);
     }),
     
     // @desc    Refresh access token by refresh and jwt on cookies

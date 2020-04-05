@@ -19,10 +19,14 @@
             <section class="col-sm-8 user-details">
                 <div>
                     <h4>
-                        {{ getSingleUser.username }}
-                        <router-link v-if="getSingleUser._id === getUser._id" to="/users/accounts/edit" class="btn btn-light">
+                        <span>{{ getSingleUser.username }}</span>
+
+                        <router-link v-if="getSingleUser._id === getUser._id" to="/users/accounts/edit" class="btn btn-custom">
                             Editar perfil <i class="icon ui-1_settings-gear-63"></i>
                         </router-link>
+                        <button v-else class="btn btn-custom" @click="btnFollow">
+                            {{ getUser.following.includes(getSingleUser._id) ? 'Seguindo' : 'Seguir' }}
+                        </button>
                     </h4>
                 </div>
                 <div>
@@ -56,7 +60,12 @@ export default {
         Navbar, Errors
     },
     methods: {
-        ...mapActions('users', ['getUserByUsername'])
+        ...mapActions('users', ['getUserByUsername', 'followUser', 'unfollowUser']),
+        btnFollow() {
+            if (this.getUser.following.includes(this.getSingleUser._id))
+                this.unfollowUser({followeeUser: this.getSingleUser._id, followerUser: this.getUser._id});
+            else this.followUser(this.getSingleUser._id);
+        }
     },
     created() {
         this.getUserByUsername(this.$route.params.user);
@@ -72,6 +81,14 @@ export default {
 .show-user > main {
     width: 70%;
     margin: 32px auto;
+}
+
+.btn-custom {
+    border: 1px solid rgba(190, 187, 187, 1);
+    border-radius: 3px;
+    font-size: .9rem;
+    font-weight: 600;
+    padding: .375rem 1.375rem;
 }
 
 main header {
@@ -92,6 +109,9 @@ main header > .profile-photo img {
 main header > .user-details > :nth-child(1) h4 {
     font-size: 2em;
     margin-bottom: 16px;
+}
+main header > .user-details > :nth-child(1) h4 span {
+    margin-right: 16px;
 }
 main header > .user-details > :nth-child(2) {
     font-size: 1.1em;

@@ -1,4 +1,4 @@
-import { getUsers, getUser } from '@/services/UserService';
+import { getUsers, getUser, follow, unfollow } from '@/services/UserService';
 
 import modulesHandler from '@/utils/modulesHandler';
 
@@ -27,7 +27,24 @@ const actions = {
         if (!data.success) throw data.error;
 
         commit('setUser', data.data);
-    })
+    }),
+    followUser: modulesHandler(async ({dispatch}, user) => {
+        const data = await follow(user);
+        
+        if (!data.success) throw data.error;
+
+        await dispatch('getUserByUsername', user);
+        await dispatch('auth/getLoggedInUser', null, { root: true });
+    }),
+    unfollowUser: modulesHandler(async ({dispatch}, {followeeUser, followerUser}) => {
+        const data = await unfollow({ followeeUser, followerUser });
+        
+        if (!data.success) throw data.error;
+
+        await dispatch('getUserByUsername', followeeUser);
+        await dispatch('auth/getLoggedInUser', null, { root: true });
+    }),
+    socket_newFollower({commit}, user) { console.log(commit, user); alert(`O usuário ${user} começou te seguir`) },
 };
 
 const mutations = {

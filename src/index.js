@@ -24,10 +24,21 @@ const app = express();
 // Socket.io setup
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+let currentConnections = {};
+
 app.use((req, res, next) => {
     req.io = io;
+    req.currentConnections = currentConnections;
 
     next();
+});
+io.on('connection', socket => {
+    currentConnections[socket.id] = { socketId: socket.id }
+
+    socket.on('userLogIn', id => currentConnections[socket.id].userId = id);
+    socket.on('userLogOut', () => delete currentConnections[socket.id].userId);
+    
+    socket.on('disconnect', () => delete currentConnections[socket.id]);
 });
 
 // Middlewares
