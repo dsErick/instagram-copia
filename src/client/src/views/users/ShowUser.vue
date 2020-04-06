@@ -5,15 +5,30 @@
 
     <main v-if="getSingleUser.username === $route.params.user || getSingleUser._id === $route.params.user">
         <header class="row">
-            <div class="col-sm-4 profile-photo row d-flex align-items-center">
-                <div class="col-sm-12 col-5">
+            <div class="col-sm-4 profile-photo row align-items-center pr-0">
+                <div class="col-sm-12 col-auto pl-0 mx-auto mb-1">
                     <img :src="`${$backendURL}/media/profiles/${getSingleUser.profilePhoto}`" :alt="`${getSingleUser.name} profile photo`">
                 </div>
-                <div class="d-sm-none col-7">
-                    <router-link v-if="getSingleUser._id === getUser._id" to="/users/accounts/edit" class="btn btn-light mb-2 w-100">
+                <div class="d-sm-none col pr-0">
+                    <router-link v-if="getSingleUser._id === getUser._id" to="/users/accounts/edit" class="btn btn-custom w-100">
                         Editar perfil <i class="icon ui-1_settings-gear-63"></i>
                     </router-link>
-                    <strong>{{ getSingleUser.posts.length }}</strong> publicações
+                    <button v-else class="btn btn-custom w-100" @click="btnFollow">
+                        {{ getUser.following.includes(getSingleUser._id) ? 'Seguindo' : 'Seguir' }}
+                    </button>
+                    <div class="d-flex justify-content-between mt-2">
+                        <span><strong>{{ getSingleUser.posts.length }}</strong><br>Publicações</span>
+                        <span>
+                            <router-link :to="`/users/${getSingleUser.username}/followers`" class="no-link">
+                                <strong>{{ getSingleUser.followers.length }}</strong><br> Seguidores
+                            </router-link>
+                        </span>
+                        <span>
+                            <router-link :to="`/users/${getSingleUser.username}/following`" class="no-link">
+                                <strong>{{ getSingleUser.following.length }}</strong><br> Seguindo
+                            </router-link>
+                        </span>
+                    </div>
                 </div>
             </div>
             <section class="col-sm-8 user-details">
@@ -29,8 +44,18 @@
                         </button>
                     </h4>
                 </div>
-                <div>
-                    <strong>{{ getSingleUser.posts.length }}</strong> publicações
+                <div class="d-flex justify-content-between">
+                    <span><strong>{{ getSingleUser.posts.length }}</strong> Publicações</span>
+                    <span>
+                        <router-link :to="`/users/${getSingleUser.username}/followers`" class="no-link">
+                            <strong>{{ getSingleUser.followers.length }}</strong> Seguidores
+                        </router-link>
+                    </span>
+                    <span>
+                        <router-link :to="`/users/${getSingleUser.username}/following`" class="no-link">
+                            <strong>{{ getSingleUser.following.length }}</strong> Seguindo
+                        </router-link>
+                    </span>
                 </div>
                 <div>
                     <h5>{{ getSingleUser.name }}</h5>
@@ -90,6 +115,14 @@ export default {
     font-weight: 600;
     padding: .375rem 1.375rem;
 }
+.btn-custom:hover {
+    background: #F8F9FA;
+}
+
+.no-link {
+    color: inherit;
+    text-decoration: inherit;
+}
 
 main header {
     margin: 0;
@@ -98,6 +131,9 @@ main header {
 }
 main header > .profile-photo {
     text-align: center;
+}
+main header > .profile-photo > :last-child span {
+    margin: 0 2px;
 }
 main header > .profile-photo img {
     max-width: 150px;
@@ -156,7 +192,7 @@ main .posts .post-image img {
     }
     main header .user-details > :nth-child(1) h4,
     main header .user-details > :nth-child(2) {
-        display: none;
+        display: none !important;
     }
     main header .user-details > :nth-child(3) {
         margin-top: 16px;

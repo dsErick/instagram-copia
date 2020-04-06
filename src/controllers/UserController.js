@@ -142,3 +142,35 @@ exports.unfollowUser = asyncHandler(async (req, res, next) => {
         data: `O usuário ${followerUser._id} deixou de seguir ${followeeUser._id}`
     });
 });
+
+// @desc    Get user followers
+// @route   GET /api/v1/users/:id/followers
+// @access  Private
+exports.getUserFollowers = asyncHandler(async (req, res, next) => {
+    const user = await User.findOne({ username: req.params.id });
+
+    if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário ${req.params.id}`, 404));
+
+    const followers = await User.find({ _id: user.followers }).select('username profilePhoto').sort('username');
+
+    res.status(200).json({
+        success: true,
+        data: followers
+    });
+});
+
+// @desc    Get user following
+// @route   GET /api/v1/users/:id/following
+// @access  Private
+exports.getUserFollowing = asyncHandler(async (req, res, next) => {
+    const user = await User.findOne({ username: req.params.id });
+
+    if (!user) return next(new ErrorResponse(`Não foi encontrado nenhum usuário ${req.params.id}`, 404));
+
+    const following = await User.find({ _id: user.following }).select('username profilePhoto').sort('username');
+
+    res.status(200).json({
+        success: true,
+        data: following
+    });
+});

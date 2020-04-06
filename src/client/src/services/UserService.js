@@ -25,3 +25,15 @@ export const unfollow = servicesHandler(async ({followeeUser, followerUser}) => 
     
     return data;
 });
+
+export const getUserFollowers = servicesHandler(async user => {
+    const { data } = await http.get(`/users/${user}/followers`);
+    
+    return data;
+});
+
+export const getUserFollowing = servicesHandler(async user => {
+    const { data } = await http.get(`/users/${user}/following`);
+    
+    return data;
+});

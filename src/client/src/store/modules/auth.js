@@ -174,7 +174,12 @@ const actions = {
 const mutations = {
     setToken: (state, token) => state.token = token,
     setUser: (state, user) => state.user = user,
-    reset: state => { state.token = ''; state.user = {}; }
+    reset: state => { state.token = ''; state.user = {}; },
+    setFollowing: (state, user) => state.user.following.unshift(user),
+    removeFollowing: (state, user) => {
+        const index = state.user.following.indexOf(user);
+        if (index !== -1) state.user.following.splice(index, 1);
+    }
 };
 
 export default {

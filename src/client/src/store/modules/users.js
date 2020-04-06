@@ -1,4 +1,5 @@
-import { getUsers, getUser, follow, unfollow } from '@/services/UserService';
+import router from '@/router';
+import { getUsers, getUser, follow, unfollow, getUserFollowers, getUserFollowing } from '@/services/UserService';
 
 import modulesHandler from '@/utils/modulesHandler';
 
@@ -27,28 +28,57 @@ const actions = {
         if (!data.success) throw data.error;
 
         commit('setUser', data.data);
+
+        commit('errors/resetErrors', null, { root: true });
     }),
-    followUser: modulesHandler(async ({dispatch}, user) => {
+    followUser: modulesHandler(async ({commit}, user) => {
         const data = await follow(user);
         
+        // Check for errors
         if (!data.success) throw data.error;
 
-        await dispatch('getUserByUsername', user);
-        await dispatch('auth/getLoggedInUser', null, { root: true });
+        if (router.currentRoute.name === 'ShowUser') commit('setFollower', user);
+        commit('auth/setFollowing', user, { root: true });
+
+        commit('errors/resetErrors', null, { root: true });
     }),
-    unfollowUser: modulesHandler(async ({dispatch}, {followeeUser, followerUser}) => {
-        const data = await unfollow({ followeeUser, followerUser });
+    unfollowUser: modulesHandler(async ({commit}, {followeeUser, followerUser}) => {
+        const data = await unfollow({followeeUser, followerUser});
+        
+        // Check for errors
+        if (!data.success) throw data.error;
+
+        if (router.currentRoute.name === 'ShowUser') commit('removeFollower', followeeUser);
+        commit('auth/removeFollowing', followeeUser, { root: true });
+
+        commit('errors/resetErrors', null, { root: true });
+    }),
+    getUserFollowers: modulesHandler(async ({commit}, user) => {
+        const data = await getUserFollowers(user);
         
         if (!data.success) throw data.error;
 
-        await dispatch('getUserByUsername', followeeUser);
-        await dispatch('auth/getLoggedInUser', null, { root: true });
+        commit('setUser', data.data);
+        commit('errors/resetErrors', null, { root: true });
     }),
-    socket_newFollower({commit}, user) { console.log(commit, user); alert(`O usuário ${user} começou te seguir`) },
+    getUserFollowing: modulesHandler(async ({commit}, user) => {
+        const data = await getUserFollowing(user);
+        
+        if (!data.success) throw data.error;
+
+        commit('setUser', data.data);
+        commit('errors/resetErrors', null, { root: true });
+    }),
+    socket_newFollower({commit}, user) { console.log(commit, user) },
 };
 
 const mutations = {
-    setUser: (state, user) => state.user = user
+    setUser: (state, user) => state.user = user,
+    setFollower: (state, user) => state.user.followers.unshift(user),
+    removeFollower: (state, user) => {
+        const index = state.user.followers.indexOf(user);
+        if (index !== -1) state.user.followers.splice(index, 1);
+    }
 };
 
 export default {
