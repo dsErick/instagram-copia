@@ -7,7 +7,7 @@
         <article v-if="getPosts._id === $route.params.id">
             <header class="d-flex align-items-center">
                 <router-link :to="`/users/${getPosts.user.username}`">
-                    <img class="profile-picture" :src="`http://192.168.88.146:5000/media/profiles/${getPosts.user.profilePhoto}`" alt="Profile Picture">
+                    <img class="profile-picture" :src="`${$backendURL}/media/profiles/${getPosts.user.profilePhoto}`" alt="Profile Picture">
                 </router-link>
                 <h4 class="w-100">
                     <router-link :to="`/users/${getPosts.user.username}`" class="user-link">
@@ -20,7 +20,7 @@
             </header>
 
             <div class="post-picture-wrapper">
-                <img class="post-picture" :src="`http://192.168.88.146:5000/media/posts/${getPosts.user._id}/${getPosts.image}`" alt="Post">
+                <img class="post-picture" :src="`${$backendURL}/media/posts/${getPosts.user._id}/${getPosts.image}`" alt="Post">
             </div>
             
             <div class="post-body">

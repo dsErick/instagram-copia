@@ -4,7 +4,8 @@
 
     <Navbar />
     <Errors />
-    <main v-if="getPosts.length > 0" class="posts-wrapper">
+    <div v-if="getPosts.length === 0" class="text-center"><h4>Comece a seguir alguém para ver publicações</h4></div>
+    <main v-else class="posts-wrapper">
         <article v-for="post in getPosts" :key="post._id" class="mb-5">
             <header class="d-flex align-items-center">
                 <router-link :to="`/users/${post.user.username}`">

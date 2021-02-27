@@ -3,7 +3,7 @@ import NProgress from 'nprogress';
 import store from '@/store';
 
 const http = axios.create({
-    baseURL: 'http://192.168.88.146:5000/api/v1',
+    baseURL: 'http://192.168.0.109:5000/api/v1',
     withCredentials: true
 });
 

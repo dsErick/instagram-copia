@@ -8,7 +8,7 @@ const Post = require('../models/Post');
 // @route   GET /api/v1/posts
 // @access  Public
 exports.getPosts = asyncHandler(async (req, res, next) => {
-    const posts = await Post.find(req.params.userId ? { user: req.params.userId } : {}).populate([
+    const posts = await Post.find(req.params.userId ? { user: req.params.userId } : { user: { $in: req.user.following }}).populate([
         'commentsCount',
         { path: 'comments', populate: { path: 'user', select: 'username' }, options: { sort: '-createdAt' }, justOne: true },
         { path: 'user', select: 'username profilePhoto' }

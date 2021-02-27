@@ -14,10 +14,10 @@ Vue.config.productionTip = false
 
 Vue.use(require('vue-moment'))
 
-Vue.prototype.$backendURL = 'http://192.168.88.146:5000';
+Vue.prototype.$backendURL = 'http://192.168.0.109:5000';
 
 Vue.use(new VueSocketIO({
-  connection: 'http://192.168.88.146:5000',
+  connection: 'http://192.168.0.109:5000',
   vuex: {
     store,
     actionPrefix: 'socket_',
